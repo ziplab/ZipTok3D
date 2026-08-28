@@ -38,6 +38,7 @@ call receives a physical `192 + K` sequence without suffix padding.
 cod/                         models, data modules, losses, solvers, metrics
 config/                      paper training and ablation configurations
 engine/                      configuration and Lightning utilities
+external/                    third-party baseline source snapshots
 tools/trellis500k_preprocess.py
                               TRELLIS preprocessing, splitting, and packing
 tools/validate_release.py    dependency-free release audit
@@ -52,9 +53,9 @@ benchmark_reconstruction.py  trained-checkpoint reconstruction efficiency
 benchmark_generation.py      trained-checkpoint generation efficiency
 ```
 
-`3DShape2VecSet-master/` and `3DILG-master/` are the official baseline source
-snapshots used for comparison. Their licenses and original instructions remain
-inside those directories. See `THIRD_PARTY.md`.
+`external/3DShape2VecSet-master/` and `external/3DILG-master/` are the official
+baseline source snapshots used for comparison. Their licenses and original
+instructions remain inside those directories. See `THIRD_PARTY.md`.
 
 ## Environment
 

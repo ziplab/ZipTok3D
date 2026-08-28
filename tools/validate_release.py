@@ -81,10 +81,12 @@ def main():
                 errors += fail(f"non-UTF-8 text file: {relative}")
                 continue
             is_validator = path.resolve() == Path(__file__).resolve()
-            if not is_validator and not any(
-                part in {"3DShape2VecSet-master", "3DILG-master"}
-                for part in relative.parts
-            ):
+            is_external_baseline = (
+                len(relative.parts) > 1
+                and relative.parts[0] == "external"
+                and relative.parts[1] in {"3DShape2VecSet-master", "3DILG-master"}
+            )
+            if not is_validator and not is_external_baseline:
                 for phrase in FORBIDDEN_TEXT:
                     if phrase.lower() in text.lower():
                         errors += fail(f"forbidden release text {phrase!r} in {relative}")
