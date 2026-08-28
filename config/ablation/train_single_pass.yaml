@@ -1,0 +1,14 @@
+_base_: ../train_ziptok3d_shapenet
+
+model:
+  num_latents: 128
+  nested_dropout_strategy: prefix_budget_uniform
+  decoder_params:
+    num_layers: 6
+    num_loops: 1
+
+solver:
+  elt_distill: false
+  elt_min_loop: 1
+  elt_max_loop: 1
+  metrics_jsonl_path: null
