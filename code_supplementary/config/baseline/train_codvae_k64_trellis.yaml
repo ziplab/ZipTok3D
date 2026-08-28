@@ -1,4 +1,0 @@
-_base_: train_codvae_k32_trellis
-
-model:
-  num_latents: 64
