@@ -1,0 +1,14 @@
+__pycache__
+*.py[cod]
+.idea
+*.egg-info
+external/pointops/build
+
+/datasets
+/logs
+/secrets
+/lightning_logs
+/weights
+/results
+/generated
+/latent_cache
