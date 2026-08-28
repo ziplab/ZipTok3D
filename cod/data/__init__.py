@@ -1,0 +1,2 @@
+from .latent_cache import ShapeNetLatentDataModule
+from .trellis import TrellisOccupancyDataModule
