@@ -9,6 +9,10 @@ bases. Each component remains subject to its own license.
 | 3DILG | `external/3DILG-master/` | https://github.com/1zb/3DILG | CC BY-NC-SA 4.0 | Baseline experiments |
 | pointops | External dependency; not included | https://github.com/Silverster98/pointops | Not redistributed in this package | CUDA farthest-point sampling and KNN |
 
+The baseline snapshots are kept for comparison and retain their upstream
+instructions. Their optional runtime dependencies are not part of the main
+`requirements.txt` environment.
+
 The ZipTok3D implementation builds on the public COD-VAE method and follows
 its tokenizer, triplane selection, and occupancy-decoding conventions. The
 submission package contains the integrated implementation needed for the paper

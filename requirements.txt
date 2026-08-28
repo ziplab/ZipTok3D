@@ -6,6 +6,7 @@ ninja==1.11.1.1
 numpy==1.25.1
 omegaconf==2.3.0
 opencv-python-headless==4.8.0.74
+point-cloud-utils
 PyMCubes==0.1.4
 scipy==1.11.1
 setuptools==68.0.0
