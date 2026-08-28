@@ -1,0 +1,18 @@
+_target_: cod.data.trellis.TrellisOccupancyDataModule
+root_dir: datasets/trellis500k/packed
+
+batch_size: 56
+eval_batch_size: 1
+num_workers: 8
+prefetch_factor: 2
+model_selection_split: val
+evaluation_split: test
+
+num_query_points: 4096
+pc_size: 2048
+chunk_size: 5000
+oversample_ratio: 3
+use_queries: true
+use_full_surface: false
+repeat: 16
+max_open_shards: 2
