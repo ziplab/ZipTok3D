@@ -1,0 +1,15 @@
+einops==0.7.0
+h5py==3.9.0
+lightning==2.0.5
+matplotlib==3.7.2
+ninja==1.11.1.1
+numpy==1.25.1
+omegaconf==2.3.0
+opencv-python-headless==4.8.0.74
+PyMCubes==0.1.4
+scipy==1.11.1
+setuptools==68.0.0
+torch==2.1.0
+torchmetrics==1.0.1
+tqdm==4.65.0
+trimesh==4.2.4
