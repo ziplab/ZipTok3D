@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ZipTok3D: high-fidelity 3D tokenization with compact token prefixes and shared iterative decoding.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ZipTok3D - Compact Token Prefixes for High-Fidelity 3D">
+  <meta property="og:description" content="High-fidelity 3D reconstruction from compact global-token prefixes with shared iterative decoding.">
+  <meta property="og:url" content="https://forthloth.github.io/ziptok3d/">
+  <meta property="og:image" content="https://forthloth.github.io/ziptok3d/assets/headfig.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ZipTok3D - Compact Token Prefixes for High-Fidelity 3D">
+  <meta name="twitter:description" content="High-fidelity 3D reconstruction from compact global-token prefixes with shared iterative decoding.">
+  <meta name="twitter:image" content="https://forthloth.github.io/ziptok3d/assets/headfig.png">
+  <link rel="icon" type="image/png" href="assets/hero-poster-compact.png">
+  <title>ZipTok3D - Compact Token Prefixes for High-Fidelity 3D</title>
+<link rel="stylesheet" href="styles.css?v=media8">
+</head>
+<body>
+  <nav class="site-nav" aria-label="Primary navigation">
+    <a class="brand" href="#top" aria-label="ZipTok3D home">
+      <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span>ZipTok3D</span>
+    </a>
+    <button class="nav-toggle" type="button" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Open navigation">
+      <i data-lucide="menu" aria-hidden="true"></i>
+    </button>
+    <div class="nav-links" id="nav-links">
+      <a href="#method">Method</a>
+      <a href="#explorer">Explorer</a>
+      <a href="#results">Results</a>
+      <a href="#gallery">Gallery</a>
+    </div>
+<a class="nav-paper" href="paper/ArXiv_ZipTok3D.pdf" target="_blank" rel="noreferrer">
+      <i data-lucide="file-text" aria-hidden="true"></i>
+      Paper
+    </a>
+  </nav>
+
+  <main>
+    <header class="hero" id="top">
+      <div class="hero-content">
+        <p class="eyebrow">High-fidelity 3D tokenization</p>
+        <h1>ZipTok3D</h1>
+        <p class="hero-deck">Compact global-token prefixes, unfolded through parameter-shared iterative decoding.</p>
+        <p class="hero-authors" aria-label="Authors">
+          <a href="https://github.com/forthloth" target="_blank" rel="noreferrer">Mingda Lin</a><sup>*</sup><span aria-hidden="true">·</span>
+          <a href="https://lhmd.top/" target="_blank" rel="noreferrer">Weijie Wang</a><sup>*</sup><span aria-hidden="true">·</span>
+          <a href="https://steve-zeyu-zhang.github.io/" target="_blank" rel="noreferrer">Zeyu Zhang</a><span aria-hidden="true">·</span>
+          <a href="https://github.com/argsss" target="_blank" rel="noreferrer">Bowen Cui</a><span aria-hidden="true">·</span>
+          <a href="https://hexy.tech/" target="_blank" rel="noreferrer">Yefei He</a><span aria-hidden="true">·</span>
+          <a href="https://zhao-haoyu.github.io/" target="_blank" rel="noreferrer">Haoyu Zhao</a><span aria-hidden="true">·</span>
+          <a href="https://github.com/Yuanyu0" target="_blank" rel="noreferrer">Yuanyu He</a><span aria-hidden="true">·</span>
+          <a href="https://donydchen.github.io/" target="_blank" rel="noreferrer">Donny Y. Chen</a><span aria-hidden="true">·</span>
+          <a href="https://chenfeng1271.github.io/" target="_blank" rel="noreferrer">Feng Chen</a><sup>&dagger;</sup><span aria-hidden="true">·</span>
+          <a href="https://bohanzhuang.github.io/" target="_blank" rel="noreferrer">Bohan Zhuang</a><sup>&dagger;</sup>
+          <span class="author-note"><sup>*</sup> Equal contribution <span aria-hidden="true">·</span> <sup>&dagger;</sup> Corresponding authors</span>
+        </p>
+        <div class="hero-actions">
+<a class="button button-primary" href="paper/ArXiv_ZipTok3D.pdf" target="_blank" rel="noreferrer">
+            <i data-lucide="file-text" aria-hidden="true"></i>
+            Read paper
+          </a>
+          <a class="button button-secondary" href="https://github.com/forthloth/ziptok3d/tree/main/code_supplementary" target="_blank" rel="noreferrer">
+            <i data-lucide="layers-3" aria-hidden="true"></i>
+            Supplementary code
+          </a>
+        </div>
+        <div class="hero-facts" aria-label="Headline results">
+          <div><strong>1</strong><span>token on ShapeNet</span></div>
+          <div><strong>4</strong><span>tokens on TRELLIS</span></div>
+          <div><strong>5</strong><span>shared refinement passes</span></div>
+        </div>
+      </div>
+      <figure class="hero-figure hero-video-figure">
+        <video src="assets/media-supplementary.mp4" poster="assets/hero-poster.png" autoplay muted loop playsinline preload="metadata" aria-label="ZipTok3D overview video"></video>
+        <figcaption>ZipTok3D in motion: compact prefixes, shared refinement, and reconstructed 3D geometry.</figcaption>
+      </figure>
+    </header>
+
+    <section class="thesis-band" aria-labelledby="thesis-title">
+      <div class="section-inner thesis-grid">
+        <p class="section-index">01 / Premise</p>
+        <div>
+          <h2 id="thesis-title">Spend fewer tokens. Let shared computation recover the detail.</h2>
+          <p>Fixed-budget tokenizers ask every token to share the load. ZipTok3D instead learns an ordered family of prefixes: early tokens preserve object-wide geometry, while later tokens add residual detail. A recurrent decoder then turns a short code into a complete triplane without generative completion.</p>
+        </div>
+        <div class="thesis-proof">
+          <strong>32x</strong>
+          <span>shorter than COD-VAE-32 at the ShapeNet headline point, with matched rounded CD and F1.</span>
+        </div>
+      </div>
+      <figure class="premise-figure">
+        <img src="assets/headfig.png" alt="Comparison of Ground Truth, VecSet with 512 tokens, COD-VAE with 32 tokens, and ZipTok3D with one token and five refinement steps." loading="lazy">
+        <figcaption>At the headline operating point, one ZipTok3D token approaches the reconstruction quality of a 32-token COD-VAE.</figcaption>
+      </figure>
+    </section>
+
+    <section class="method-section" id="method" aria-labelledby="method-title">
+      <div class="section-inner">
+        <div class="section-heading">
+          <div>
+            <p class="section-index">02 / Method</p>
+            <h2 id="method-title">An ordered prefix, decoded repeatedly</h2>
+          </div>
+          <p>The encoder maps 2,048 sampled surface points to an ordered latent bank. An exact prefix conditions the learned triplane state: 192 selected tokens are refined repeatedly, while 576 bypassed tokens remain fixed. The restored triplane is queried at <em>Q</em> to produce occupancy predictions.</p>
+        </div>
+
+        <div class="method-tool" aria-label="ZipTok3D method overview">
+          <div class="method-figure" aria-label="ZipTok3D method overview from input to occupancy output">
+            <img src="assets/mainfig.png" alt="ZipTok3D method overview: input surface points are encoded into an ordered latent bank, nested dropout keeps a prefix, triplane tokens are selected, a shared block refines the selected tokens for L steps, and an occupancy MLP produces the output.">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="explorer-section" id="explorer" aria-labelledby="explorer-title">
+      <div class="section-inner">
+        <div class="section-heading explorer-heading">
+          <div>
+            <p class="section-index">03 / Operating space</p>
+            <h2 id="explorer-title">Prefix length &times; refinement depth explorer</h2>
+          </div>
+          <div class="segmented" id="dataset-control" aria-label="Dataset">
+            <button type="button" data-dataset="ShapeNet" aria-pressed="true">ShapeNet</button>
+            <button type="button" data-dataset="TRELLIS" aria-pressed="false">TRELLIS</button>
+          </div>
+        </div>
+
+        <div class="metric-tabs" id="metric-control" role="tablist" aria-label="Metric">
+          <button type="button" role="tab" data-metric="query_iou" aria-selected="true">Query IoU</button>
+          <button type="button" role="tab" data-metric="mesh_fscore_0p02" aria-selected="false">Mesh F1@0.02</button>
+          <button type="button" role="tab" data-metric="mesh_cd" aria-selected="false">Mesh CD</button>
+        </div>
+
+        <div class="explorer-layout">
+        <div class="heatmap-wrap" aria-label="Scrollable metric heatmap">
+            <div class="heatmap" id="heatmap" role="grid" aria-label="Metric values by prefix length and refinement depth"></div>
+            <div class="heatmap-legend" aria-hidden="true">
+              <span>lower relative quality</span><span class="legend-ramp"></span><span>higher relative quality</span>
+            </div>
+          </div>
+          <aside class="selection-panel" aria-live="polite">
+            <p class="selection-kicker" id="selection-dataset">ShapeNet operating point</p>
+            <div class="selection-point"><span id="selection-k">K = 1</span><span id="selection-l">L = 5</span></div>
+            <div class="selection-metrics">
+              <div><span>Query IoU</span><strong id="selected-iou">96.8</strong><small>%</small></div>
+              <div><span>Mesh CD</span><strong id="selected-cd">0.012</strong></div>
+              <div><span>Mesh F1</span><strong id="selected-f1">97.8</strong><small>%</small></div>
+            </div>
+            <p id="selection-insight">Five passes recover most of the gap that remains under single-pass decoding.</p>
+            <div class="selection-sliders">
+              <label for="explorer-k">K <span id="explorer-k-value">1</span></label>
+              <input id="explorer-k" type="range" min="0" max="7" value="0" step="1">
+              <label for="explorer-l">L <span id="explorer-l-value">5</span></label>
+              <input id="explorer-l" type="range" min="1" max="6" value="5" step="1">
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="refinement-section" id="refinement" aria-labelledby="refinement-title">
+      <div class="section-inner">
+        <div class="section-heading refinement-heading">
+          <div>
+            <p class="section-index">04 / Progressive unfolding</p>
+            <h2 id="refinement-title">Shared computation unfolds the prefix</h2>
+          </div>
+          <p>Choose a shape to compare three refinement depths. The synchronized players keep the geometry aligned while you scrub or pause.</p>
+        </div>
+
+        <div class="refinement-depth-layout">
+          <aside class="refinement-copy">
+            <div class="refinement-video-heading">
+              <span>Same shape</span>
+              <strong>L = 1 / 3 / 5</strong>
+            </div>
+            <div class="sample-picker" id="depth-sample-picker" aria-label="Select a refinement-depth sample"></div>
+            <div class="refinement-meta">
+              <span id="depth-sample-name">Bridge</span>
+              <strong id="depth-sample-config">K = 2, shared decoder</strong>
+            </div>
+          </aside>
+          <div class="refinement-media refinement-video-panel">
+            <div class="video-toolbar" aria-label="Refinement playback controls">
+              <button type="button" id="depth-prev" class="media-command" title="Previous sample"><i data-lucide="chevron-left" aria-hidden="true"></i><span>Previous</span></button>
+              <button type="button" id="depth-seek-back" class="media-command" title="Seek backward 0.5 seconds"><i data-lucide="rewind" aria-hidden="true"></i><span>Back 0.5s</span></button>
+              <button type="button" id="depth-play-toggle" class="media-command" title="Pause or play all refinement videos"><i data-lucide="pause" aria-hidden="true"></i><span>Pause all</span></button>
+              <button type="button" id="depth-seek-forward" class="media-command" title="Seek forward 0.5 seconds"><i data-lucide="fast-forward" aria-hidden="true"></i><span>Forward 0.5s</span></button>
+              <button type="button" id="depth-next" class="media-command" title="Next sample"><i data-lucide="chevron-right" aria-hidden="true"></i><span>Next</span></button>
+              <span class="video-time" id="depth-time">0.0s / 4.0s</span>
+            </div>
+            <div class="refinement-depth-grid" id="depth-video-grid"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="results-section" id="results" aria-labelledby="results-title">
+      <div class="section-inner">
+        <div class="section-heading">
+          <div>
+            <p class="section-index">05 / Evidence</p>
+            <h2 id="results-title">Tiny prefixes, competitive surfaces</h2>
+          </div>
+          <p>All ZipTok3D rows use the same selected checkpoint per dataset and five refinement passes. IoU and F1 are percentages; lower CD is better.</p>
+        </div>
+
+        <div class="result-switch segmented" id="result-dataset-control" aria-label="Results dataset">
+          <button type="button" data-result-dataset="ShapeNet" aria-pressed="true">ShapeNet</button>
+          <button type="button" data-result-dataset="TRELLIS" aria-pressed="false">TRELLIS</button>
+        </div>
+        <div class="table-responsive" aria-label="Scrollable results table">
+          <table class="results-table">
+            <thead><tr><th>Method</th><th>Tokens</th><th>IoU <span>higher</span></th><th>CD <span>lower</span></th><th>F1 <span>higher</span></th></tr></thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+
+        <div class="generation-band">
+          <div>
+            <p class="section-index">Class-conditioned generation</p>
+            <h3>A physical 2 x 32 causal prefix</h3>
+            <p>ZipTok3D-2 remains close to COD-VAE-32 on distribution metrics while improving latent sampling throughput from 46.02 to 50.62 samples/s.</p>
+          </div>
+          <div class="generation-measures" aria-label="ZipTok3D generation results">
+            <div><span>MMD-CD</span><strong>5.142</strong></div>
+            <div><span>COV-CD</span><strong>84.91%</strong></div>
+            <div><span>1-NNA-CD</span><strong>54.21%</strong></div>
+            <div><span>Full throughput</span><strong>36.64/s</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="gallery-section" id="gallery" aria-labelledby="gallery-title">
+      <div class="section-inner">
+        <div class="section-heading gallery-heading">
+          <div>
+            <p class="section-index">06 / Reconstructions</p>
+            <h2 id="gallery-title">ZipTok3D reconstructions</h2>
+          </div>
+          <p>Each card is a ZipTok3D output from the fixed K = 1 or K = 4 evaluation sets. Use the filters to scan all available ShapeNet and TRELLIS examples.</p>
+        </div>
+        <div class="gallery-controls">
+          <div class="segmented" aria-label="Reconstruction dataset filter">
+            <button type="button" data-gallery-dataset="all" aria-pressed="true">All datasets</button>
+            <button type="button" data-gallery-dataset="ShapeNet" aria-pressed="false">ShapeNet</button>
+            <button type="button" data-gallery-dataset="TRELLIS" aria-pressed="false">TRELLIS</button>
+          </div>
+          <div class="segmented" aria-label="Reconstruction token filter">
+            <button type="button" data-gallery-token="all" aria-pressed="true">All prefixes</button>
+            <button type="button" data-gallery-token="1" aria-pressed="false">K = 1</button>
+            <button type="button" data-gallery-token="4" aria-pressed="false">K = 4</button>
+          </div>
+        </div>
+        <p class="gallery-summary" id="gallery-summary">11 ZipTok3D reconstructions | ShapeNet + TRELLIS | L = 5.</p>
+        <div class="reconstruction-gallery" id="reconstruction-gallery" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="resources-section" aria-labelledby="resources-title">
+      <div class="section-inner resources-layout">
+        <div>
+          <p class="section-index">07 / Resources</p>
+          <h2 id="resources-title">Paper, diagnostics, and implementation</h2>
+        </div>
+        <div class="resource-links">
+<a href="paper/ArXiv_ZipTok3D.pdf" target="_blank" rel="noreferrer"><i data-lucide="file-text" aria-hidden="true"></i><span><strong>Main paper</strong><small>ArXiv technical report and primary results</small></span><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+<a href="https://github.com/forthloth/ziptok3d/tree/main/code_supplementary" target="_blank" rel="noreferrer"><i data-lucide="layers-3" aria-hidden="true"></i><span><strong>Supplementary code</strong><small>Training, evaluation, and baseline implementations</small></span><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+<a href="paper/README.md" target="_blank" rel="noreferrer"><i data-lucide="code-2" aria-hidden="true"></i><span><strong>Project source</strong><small>ArXiv project README and source tree</small></span><i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="section-inner footer-inner">
+      <span class="brand">ZipTok3D</span>
+      <p>High-Fidelity 3D Tokenization with Compact Token Prefixes</p>
+      <a href="#top" aria-label="Back to top"><i data-lucide="arrow-up" aria-hidden="true"></i></a>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script src="app.js?v=media8"></script>
+</body>
+</html>

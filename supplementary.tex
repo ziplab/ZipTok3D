@@ -1,0 +1,1423 @@
+% \documentclass[letterpaper]{article}
+% \usepackage[submission]{aaai2027}
+% \usepackage[hyphens]{url}
+% \usepackage{graphicx}
+% \urlstyle{rm}
+% \def\UrlFont{\rm}
+% \usepackage{natbib}
+% \usepackage{caption}
+% \frenchspacing
+% \usepackage{booktabs}
+% \usepackage{multirow}
+% \usepackage{amsmath}
+% \usepackage{amssymb}
+% \usepackage{xcolor}
+% \usepackage{array}
+
+% \newcommand{\ours}{ZipTok3D}
+% \pdfinfo{/TemplateVersion (2027.1)}
+
+% \renewcommand{\thesection}{S\arabic{section}}
+% \renewcommand{\thesubsection}{S\arabic{section}.\arabic{subsection}}
+% \renewcommand{\thefigure}{\Alph{figure}}
+% \renewcommand{\thetable}{\Alph{table}}
+% \renewcommand{\theequation}{S\arabic{equation}}
+% \setcounter{secnumdepth}{2}
+
+% \title{Supplementary Material for \ours{}: High-Fidelity 3D Tokenization with Compact Token Prefixes}
+% \author{Anonymous Submission}
+% \affiliations{}
+
+% \begin{document}
+% \maketitle
+
+% \section{Prefix-Length and Refinement-Depth Analysis}
+% \label{sec:full-sweeps}
+
+% \subsection{Complete Metric Sweeps}
+
+% We evaluate prefix lengths
+% $K\in\{1,2,4,8,16,32,64,128\}$ and refinement depths
+% $L\in\{1,2,3,4,5,6\}$ using one selected checkpoint per dataset. At every
+% operating point, the decoder receives a $K\times512$ latent tensor without
+% suffix padding.
+
+% \begin{figure}[!t]
+%     \centering
+%     \begin{minipage}{\columnwidth}
+%         \centering
+%         \includegraphics[width=.79\columnwidth]
+%         {supplementary_figures/mesh_f1_interactions.pdf}
+%         \captionof{figure}{Effect of prefix length $K$ and refinement depth
+%         $L$ on mesh F1@0.02 for ShapeNet (top) and TRELLIS (bottom). The plots
+%         vary $K$ at fixed $L$ (left) and $L$ at fixed $K$ (right).}
+%         \label{fig:supp-f1-curves}
+%     \end{minipage}
+%     \begin{minipage}{\columnwidth}
+%         \centering
+%         \includegraphics[width=.79\columnwidth]
+%         {supplementary_figures/mesh_cd_interactions.pdf}
+%         \captionof{figure}{Effect of prefix length $K$ and refinement depth
+%         $L$ on mesh CD for ShapeNet (top) and TRELLIS (bottom). The plots vary
+%         $K$ at fixed $L$ (left) and $L$ at fixed $K$ (right). Lower values are
+%         better.}
+%         \label{fig:supp-cd-curves}
+%     \end{minipage}
+% \end{figure}
+
+% Figures~\ref{fig:supp-f1-curves} and~\ref{fig:supp-cd-curves} extend the
+% query-IoU analysis to the two surface metrics. Both exhibit the same asymmetric
+% interaction: increasing $K$ is most beneficial under shallow decoding, whereas
+% increasing $L$ is most beneficial for short prefixes. The
+% differences between five and six passes are small at the reported operating
+% points across query IoU, mesh CD, and mesh F1, supporting the use of five
+% passes for evaluation.
+
+% Figure~\ref{fig:supp-heatmaps} reports the complete grids for $L=2,\ldots,6$.
+% The single-pass surface-metric cross-sections, whose larger ranges would
+% compress the heatmap colors, are reported separately in
+% Figures~\ref{fig:supp-f1-curves} and~\ref{fig:supp-cd-curves}.
+
+% \begin{figure*}[!t]
+%     \centering
+%     {\setlength{\tabcolsep}{1.5pt}
+%     \begin{tabular}{@{}cc@{}}
+%     \includegraphics[width=.48\textwidth]{supplementary_figures/shapenet_query_iou.pdf} &
+%     \includegraphics[width=.48\textwidth]{supplementary_figures/trellis_query_iou.pdf} \\[-.55em]
+%     \includegraphics[width=.48\textwidth]{supplementary_figures/shapenet_mesh_f1_0p02.pdf} &
+%     \includegraphics[width=.48\textwidth]{supplementary_figures/trellis_mesh_f1_0p02.pdf} \\[-.55em]
+%     \includegraphics[width=.48\textwidth]{supplementary_figures/shapenet_mesh_cd.pdf} &
+%     \includegraphics[width=.48\textwidth]{supplementary_figures/trellis_mesh_cd.pdf}
+%     \end{tabular}}
+%     \caption{Complete ShapeNet (left) and TRELLIS (right) sweeps for
+%     refinement depths $L=2,\ldots,6$ and all supported prefix lengths. Rows
+%     report query IoU, mesh F1@0.02, and mesh CD. Cell values are dataset means.
+%     Darker cells indicate better performance; the color direction is reversed
+%     for CD.}
+%     \label{fig:supp-heatmaps}
+% \end{figure*}
+
+% \subsection{Per-Object Refinement Behavior}
+
+% \begin{table*}[!t]
+% \centering
+% \small
+% \setlength{\tabcolsep}{5pt}
+% \begin{tabular}{lccccc}
+% \toprule
+% Dataset & $K$ & Transition & IoU improved (\%) & CD improved (\%) & F1 improved (\%) \\
+% \midrule
+% \multirow{4}{*}{ShapeNet}
+%  & 1 & $1\!\rightarrow\!3$ & 100.0 & 99.3 & 97.6 \\
+%  & 1 & $3\!\rightarrow\!5$ & 88.2 & 81.1 & 58.1 \\
+%  & 4 & $1\!\rightarrow\!3$ & 100.0 & 98.7 & 94.8 \\
+%  & 4 & $3\!\rightarrow\!5$ & 89.5 & 81.5 & 55.7 \\
+% \midrule
+% \multirow{4}{*}{TRELLIS}
+%  & 1 & $1\!\rightarrow\!3$ & 98.6 & 99.8 & 99.8 \\
+%  & 1 & $3\!\rightarrow\!5$ & 91.2 & 91.8 & 84.7 \\
+%  & 4 & $1\!\rightarrow\!3$ & 98.5 & 99.7 & 99.4 \\
+%  & 4 & $3\!\rightarrow\!5$ & 90.5 & 90.7 & 83.4 \\
+% \bottomrule
+% \end{tabular}
+% \caption{Per-object refinement diagnostics. ``Improved'' means a strict
+% increase for IoU/F1 or a strict decrease for CD between the indicated passes.
+% The remaining objects are ties or regressions.}
+% \label{tab:supp-refinement-diagnostics}
+% \end{table*}
+
+% Mean improvements do not imply monotonic improvement for every object.
+% Table~\ref{tab:supp-refinement-diagnostics} therefore reports strict
+% per-object improvement rates between selected refinement depths. Query
+% comparisons include all 1,283 ShapeNet and 2,613 TRELLIS objects. Mesh
+% comparisons exclude seven
+% TRELLIS objects for which at least one reconstructed mesh in the compared pair
+% is empty or invalid, leaving 2,606 paired objects; all ShapeNet meshes are
+% valid.
+
+% Increasing depth from $L=1$ to $L=3$ improves nearly every valid object, so the
+% aggregate gain is not driven by a small subset. Increasing depth from $L=3$ to
+% $L=5$ remains beneficial for a majority of objects but is not uniformly
+% monotonic, particularly for ShapeNet mesh F1. Later passes therefore yield
+% smaller aggregate gains and may slightly degrade individual reconstructions.
+
+% \section{Experimental Setup Details}
+% \label{sec:experimental-details}
+
+% \subsection{Datasets, Preprocessing, and Splits}
+
+% \paragraph{ShapeNet.}
+% We use ShapeNetCore-v2 \citep{chang2015shapenet} with the 55-category
+% preprocessing and split manifests released by 3DShape2VecSet
+% \citep{zhang20233dshape2vecset} and adopted by COD-VAE
+% \citep{cho2025representing}.  The manifests contain 48,597 training, 1,283
+% validation, and 2,592 test objects.  For each object, the released data provide
+% uniform volume queries, near-surface queries, their occupancy labels, a
+% normalization scale, and a dense surface point cloud.  Following COD-VAE, we
+% consolidate the records by split while preserving category and object
+% identifiers.  All manifest entries used in the reported experiments are
+% successfully converted.
+% Query coordinates are stored in FP16 for training and FP32 otherwise, while
+% surface points remain in FP32.  Training samples 2,048 surface points as
+% encoder input and 4,096 queries from each of the volume and near-surface sets.
+% During training, independent axis scales are sampled uniformly from
+% $[0.75,1.25]$, the shape is renormalized to the unit cube, and Gaussian noise
+% with standard deviation 0.005 is added to the surface points before clipping
+% to $[-1,1]$.  The same geometric scaling is applied to the occupancy queries.
+% Validation and test data are not augmented, and evaluation uses all stored
+% volume queries and the full surface point cloud. The reported reconstruction,
+% ablation, and refinement analyses use the 1,283-object split named
+% \emph{validation} in the released manifests. The 2,592-object test split is
+% retained as part of the released partition but is not used in the reported
+% tokenizer tables.
+
+% \paragraph{TRELLIS.}
+% TRELLIS-500K \citep{xiang2025structured} provides metadata for 500,777
+% training assets: 168,307 Objaverse-XL Sketchfab assets, 311,843 Objaverse-XL
+% GitHub assets, 4,485 ABO assets, 9,472 3D-FUTURE assets, and 6,670 HSSD assets.
+% Its separate 3,229-object Toys4K evaluation set is not used.  Our preprocessing
+% starts from the available downloaded assets rather than the complete metadata
+% catalogue.  We merge supported polygonal components and apply the
+% point-cloud-utils watertight conversion used by the VecSet preprocessing
+% pipeline at resolution 50,000 with seed 0.  The watertight mesh is centered at
+% its bounding-box center and scaled so that its maximum vertex radius is one.
+% Each successful object is represented by 100,000 surface points, 500,000
+% volume queries sampled uniformly from the radius-$\sqrt{3}$ sphere, and
+% 500,000 near-surface queries divided equally between Gaussian perturbation
+% scales 0.005 and 0.05. Occupancy is one where the signed distance is
+% nonpositive and zero otherwise.
+% Per-object sampling is deterministic from seed 42 and the object identifier.
+% Inputs above 50,000 faces are decimated to that target before watertight
+% conversion when decimation succeeds. The preprocessing additionally sets a
+% 900-second timeout and a 32-GiB memory limit per worker. An asset is excluded
+% if it lacks a supported,
+% nonempty polygonal mesh, contains nonfinite geometry, or fails mesh conversion,
+% normalization, surface sampling, signed-distance evaluation, or the stated
+% resource limits.
+
+% The accompanying manifest fixes the held-out evaluation split at 2,613
+% objects: 57 ABO,
+% 856 Objaverse-XL GitHub, and 1,700 Objaverse-XL Sketchfab assets.  The original
+% metadata catalogue is therefore not the effective split pool. With seed 42,
+% 1\% of the successfully preprocessed pool is assigned to validation, and the
+% remaining non-evaluation objects are assigned to training. The manifest
+% contains the source category and exact object identifier of each evaluation
+% asset and defines the TRELLIS split used for all reconstruction, bootstrap,
+% and adaptive-budget analyses.
+
+% \subsection{Baseline Sources and Operating Points}
+
+% We compare with 3DILG \citep{zhang20223dilg}, VecSet
+% \citep{zhang20233dshape2vecset}, and COD-VAE
+% \citep{cho2025representing}.  These methods support deterministic
+% reconstruction at fixed, shape-independent token budgets.  All ShapeNet
+% comparisons use the common 1,283-object split and COD-VAE evaluation pipeline.
+% The ShapeNet baseline implementations and checkpoints are inherited from the
+% official COD-VAE release. On TRELLIS, COD-VAE-2/32/64 are initialized from
+% their corresponding ShapeNet checkpoints and fine-tuned on the common
+% preprocessed training pool. VecSet-512 uses the inherited ShapeNet model
+% without TRELLIS-specific training. TRELLIS results are not reported for
+% 3DILG or the shorter VecSet operating points. All reported TRELLIS methods
+% use the common split and evaluation protocol described above.
+
+% The reconstruction comparisons use 512 tokens for 3DILG; 32, 64, and 512
+% tokens for VecSet; and 2, 32, and 64 tokens for COD-VAE.  ZipTok3D is evaluated
+% with exact prefixes of 1, 2, and 4 tokens.  The class-conditioned generation
+% comparison uses the native stage-2 latent lengths of the baselines and the
+% exact two-token stage-2 representation of ZipTok3D.
+
+% \subsection{Optimization and Model Selection}
+% \label{sec:optimization}
+
+% \begin{table*}[t]
+% \centering
+% \small
+% \setlength{\tabcolsep}{4pt}
+% \begin{tabular}{lcc}
+% \toprule
+% Setting & ShapeNet & TRELLIS \\
+% \midrule
+% Optimizer & \multicolumn{2}{c}{AdamW, $\beta_1=0.9$, $\beta_2=0.999$,
+% $\epsilon=10^{-8}$, weight decay 0.01} \\
+% Initial learning rate & \multicolumn{2}{c}{$10^{-4}$} \\
+% Precision / clipping & \multicolumn{2}{c}{FP16 mixed precision / global-norm
+% threshold 0.5} \\
+% Batching & \multicolumn{2}{c}{56 examples per GPU, four A800 GPUs, three-step
+% gradient accumulation; effective batch size 672} \\
+% Training duration / schedule & 1,000 epochs; 50-epoch warmup, then cosine decay
+% & 300 epochs; constant learning rate \\
+% Seed / repetitions & \multicolumn{2}{c}{123456 / one run per configuration} \\
+% Checkpoint selection & \multicolumn{2}{c}{Highest mean query IoU on the
+% corresponding validation split} \\
+% \bottomrule
+% \end{tabular}
+% \caption{Stage-1 optimization and model-selection protocol.}
+% \label{tab:supp-training}
+% \end{table*}
+
+% Each training example contains 2,048 surface points, 4,096 uniformly sampled
+% volume queries, and 4,096 near-surface queries.  The reconstruction criterion
+% weights the volume and near-surface terms by 1.0 and 0.1, respectively.  The
+% intermediate-loss coefficient is $\beta=0.5$.  At optimizer step $t$,
+% $\alpha_t=\max(0,1-t/T_\alpha)$, with $T_\alpha$ equal to the scheduled number
+% of optimizer updates after distributed batching and gradient accumulation.
+% Stage-1 training unrolls six refinement passes and samples one intermediate
+% depth uniformly from $\{1,\ldots,5\}$.  Thus $\alpha_t$ decays over the full
+% training run and reaches zero at its final scheduled update.
+% The implementation uses Python 3.9, PyTorch 2.1.0, and CUDA 12.2.
+
+% \subsection{Stage-2 Generation Training}
+
+% The prefix VAE uses AdamW with learning rate $10^{-4}$,
+% weight decay 0.01, global batch size 376, FP16 mixed precision, and gradient
+% clipping at 0.5.  It is trained for 100 epochs, with the learning rate halved at
+% epochs 60, 70, 80, and 90.  The EDM uses AdamW with learning rate $10^{-4}$,
+% weight decay 0.05, global batch size 256, FP16 mixed precision, and gradient
+% clipping at 1.0.  Its 1,000-epoch schedule uses a 40-epoch linear warmup followed
+% by cosine decay to $10^{-6}$.  Both stages use four A800 GPUs and seed 123456.
+% For EDM training we set $p_{\mathrm{mean}}=-1.2$,
+% $p_{\mathrm{std}}=1.2$, and $\sigma_{\mathrm{data}}=1$.  We select the
+% prefix VAE checkpoint by the highest validation query IoU and the EDM
+% checkpoint by the lowest validation denoising loss.
+
+% \section{Architecture and Loss Specifications}
+% \label{sec:architecture}
+
+% \subsection{Stage-1 Tokenizer Architecture}
+
+% Table~\ref{tab:supp-architecture} specifies the stage-1 architecture. Unless
+% noted otherwise, these components follow the released COD-VAE design
+% \citep{cho2025representing}. ZipTok3D introduces nested prefix training, the
+% shared refinement block, and intermediate supervision.
+
+% \begin{table*}[t]
+% \centering
+% \small
+% \setlength{\tabcolsep}{5pt}
+% \begin{tabular}{p{.19\textwidth}p{.74\textwidth}}
+% \toprule
+% Component & Configuration \\
+% \midrule
+% Input and point encoder & 2,048 surface points; 512 farthest-point-sampled
+% patches; width 512; four progressive encoder blocks with three self-attention
+% layers per block; eight attention heads; GEGLU MLP ratio 4; dropout 0.1. \\
+% Latent bank & Maximum length $M=128$ and width 512.  The initial latent queries
+% are point embeddings of 128 farthest-point-sampled surface positions; no
+% separate learned latent-position table is used. \\
+% Prefix sampling & One budget is sampled uniformly from
+% $\{1,2,4,8,16,32,64,128\}$ for each training example.  All suffix positions are
+% masked from every decoder attention operation. \\
+% Initial triplane tokens & Three planes, 32 channels, spatial resolution
+% $128\times128$, and patch size $8\times8$, giving 768 learned spatial tokens
+% $T^0$. \\
+% Selection and merging & Within $\mathcal{S}_{\omega}$, one cross-attention
+% layer lets $T^0$ interact with the retained prefix. A LayerNorm--MLP
+% uncertainty head then ranks the 768 spatial tokens. The top 25\% (192 tokens)
+% form $H_K^0$; the remaining tokens are summarized by cross-attention into eight
+% merged tokens $R_K$. \\
+% Shared refinement & One six-layer Transformer block of width 512, eight heads,
+% GEGLU MLP ratio 2, and dropout 0.1 is reused for every pass. Each call receives
+% the current 192 selected tokens and the retained $K$-token prefix. Only the
+% selected-token output is carried to the next pass. The eight merged tokens
+% $R_K$ bypass the shared block and remain fixed for restoration. There is no
+% causal mask, pass embedding, or loop-specific parameter. \\
+% Restoration and triplane head & Updated selected tokens are scattered back to
+% their original spatial positions.  A linear residual head maps every spatial
+% token to an $8\times8\times32$ patch and adds it to the initial triplane patch,
+% modulated by the predicted uncertainty. \\
+% Occupancy head & Features bilinearly sampled from the three planes are summed
+% and passed through a $32\!\rightarrow\!32\!\rightarrow\!1$ MLP with GELU. \\
+% \bottomrule
+% \end{tabular}
+% \caption{Detailed stage-1 tokenizer architecture.}
+% \label{tab:supp-architecture}
+% \end{table*}
+
+% \subsection{Shared Refinement and Auxiliary Losses}
+
+% The recurrent sequence at pass $\ell$ can therefore be written as
+% \begin{equation}
+% U_K^{\ell}=
+% \bigl[H_K^{\ell-1};Z_{:K}\bigr]
+% \in\mathbb{R}^{(192+K)\times512},
+% \end{equation}
+% where $H_K^{\ell-1}$ is the selected state and $Z_{:K}$ is the retained prefix.
+% The shared block processes this sequence, but only its first 192 outputs define
+% $H_K^{\ell}$. The prefix is reinserted unchanged at every pass, while the
+% merged representation $R_K$ remains outside the block and is used only when
+% restoring the complete triplane.
+
+% The two inherited COD-VAE auxiliary losses stabilize triplane initialization
+% and uncertainty-based selection. Let $a_j^0$ be the initial occupancy logit for
+% query $j$, $\hat y_j^0=\sigma(a_j^0)$ its probability, and
+% $\hat{\mathcal{Y}}^0=(\hat y_j^0)_{j=1}^{N_q}$ the corresponding probability
+% vector. The initialization loss applies the reconstruction criterion to this
+% initial prediction:
+% \begin{equation}
+% \mathcal{L}_{\mathrm{init}}
+% =\mathcal{L}_{\mathrm{rec}}(\hat{\mathcal{Y}}^0,\mathcal{Y}).
+% \end{equation}
+% The uncertainty target is the detached pointwise binary cross-entropy of the
+% initial prediction.  Following COD-VAE, it is clipped and normalized to
+% $[0,1]$ before regression:
+% \begin{align}
+% r_j & =
+% \frac{\operatorname{clip}(\operatorname{BCE}(\hat y_j^0,y_j)-0.01,0,0.99)}{0.99},\\
+% \mathcal{L}_{\mathrm{unc}}
+% &=\frac{1}{N_q}\sum_{j=1}^{N_q}(u_j-\operatorname{sg}(r_j))^2,
+% \end{align}
+% where $u_j$ is the uncertainty field decoded at the query. We use
+% $\lambda_{\mathrm{init}}=0.5$ and $\lambda_{\mathrm{unc}}=0.001$.
+
+% \subsection{Stage-2 Prefix VAE and EDM}
+
+% The prefix VAE accepts up to 16 ordered stage-1 tokens.  A LayerNorm and linear
+% projection independently map each 512-dimensional token to the mean and log
+% variance of a 32-dimensional diagonal Gaussian posterior.  The log variance is
+% clamped to $[-30,20]$, and training samples from the posterior by the
+% reparameterization trick.  A linear projection maps the sampled sequence back
+% to width 512, after which learned positional embeddings and a 12-layer
+% Transformer reconstruct the stage-1 token features.  This Transformer uses
+% eight heads, GEGLU MLP ratio 4, and dropout 0.1.  Its causal mask is
+% left-to-right:
+% \begin{equation}
+% A_{ij}=\begin{cases}
+% 0, & j\leq i,\\
+% -\infty, & j>i,
+% \end{cases}
+% \end{equation}
+% so the reconstruction at position $i$ cannot use a later token.
+
+% Let $\widetilde Z$ denote a posterior sample and
+% $\bar Z=D_{\psi}(\widetilde Z)$ the reconstructed stage-1 token sequence.  The
+% stage-1 tokenizer is frozen while the prefix VAE is jointly optimized for
+% $\mathcal{B}=\{1,2,4,8,16\}$ with weights
+% $w_K\in\{1.2,1.1,1.0,0.9,0.8\}$.  Its objective is
+% \begin{equation}
+% \begin{aligned}
+% \mathcal{L}_{\mathrm{pVAE}}
+% &=\sum_{K\in\mathcal{B}}
+% \frac{w_K}{\sum_{K'\in\mathcal{B}}w_{K'}}
+% \\[-0.2em]
+% &\quad\times\Bigl[
+% \operatorname{MSE}\!\left(\bar Z_{:K},\operatorname{LN}(Z_{:K})\right)
+% \\[-0.2em]
+% &\hspace{3.2em}
+% +\mathcal{L}_{\mathrm{rec}}\!\left(F_6(\bar Z_{:K}),\mathcal{Y}\right)
+% \Bigr]
+% \\
+% &\quad+10^{-3}D_{\mathrm{KL}}\!\left(
+% q_{\psi}(\widetilde Z\mid Z_{:16})\,\|\,\mathcal{N}(0,I)
+% \right).
+% \end{aligned}
+% \end{equation}
+% where $F_6$ denotes the frozen stage-1 decoder and occupancy head evaluated
+% with six refinement passes.  The feature and occupancy terms both have unit
+% coefficients; the volume and near-surface weighting inside
+% $\mathcal{L}_{\mathrm{rec}}$ is given in Section~\ref{sec:optimization}.
+% Causality ensures that every term for budget $K$ depends only on the
+% corresponding stage-2 prefix. The six-pass decoder is used only to supervise
+% prefix VAE training. During generation evaluation, sampled codes are decoded
+% using five refinement passes.
+
+% We cache deterministic posterior means for the full $16\times32$ latent array,
+% normalize them using training-set channel statistics, and train the
+% class-conditional EDM on these arrays. Left-to-right causal self-attention
+% ensures that the denoising prediction at each position depends only on the
+% corresponding noisy prefix. At the reported two-token operating point,
+% sampling therefore instantiates only the first two latent positions, and the
+% prefix VAE decoder receives an exact $2\times32$ tensor without suffix padding.
+% The EDM follows the latent-array design used by
+% VecSet and COD-VAE \citep{zhang20233dshape2vecset,cho2025representing}: it has
+% width 384, 16 Transformer blocks, eight 48-dimensional heads, GEGLU MLP ratio
+% 4, no dropout, learned token-position embeddings, and a left-to-right causal
+% self-attention mask. A
+% 256-dimensional sinusoidal noise embedding is projected to width 384 and
+% provides scale and shift to the adaptive LayerNorms in every block.  The class
+% index spans all 55 ShapeNet categories. It is mapped to a learned
+% 384-dimensional embedding and supplied as a one-token key/value context
+% through cross-attention in every block; token self-attention therefore models
+% the latent sequence while class conditioning is injected separately.
+
+% For a normalized latent array $x$, category $c$, and
+% $\log\sigma\sim\mathcal{N}(p_{\mathrm{mean}},p_{\mathrm{std}}^2)$, the EDM
+% objective is
+% \begin{equation}
+% \begin{aligned}
+% \mathcal{L}_{\mathrm{EDM}}
+% &=\mathbb{E}_{x,c,\sigma,\epsilon}\!\left[
+% \frac{\sigma^2+\sigma_{\mathrm{data}}^2}
+% {(\sigma\sigma_{\mathrm{data}})^2}
+% \right.\\[-0.2em]
+% &\hspace{4.2em}\left.
+% \times\left\|D_{\theta}(x+\epsilon;\sigma,c)-x\right\|_2^2
+% \right],
+% \\
+% &\hspace{4.2em}
+% \epsilon\sim\mathcal{N}(0,\sigma^2I).
+% \end{aligned}
+% \end{equation}
+% All latent positions present at an operating point are denoised in parallel;
+% there is no token-autoregressive sampling loop.
+
+% \section{Evaluation Protocols}
+% \label{sec:evaluation}
+
+% \subsection{Reconstruction Metric Settings}
+
+% Query IoU uses all 500,000 stored volume queries per object on both datasets.
+% For mesh evaluation, we query a dense
+% $128^3$ occupancy grid, extract the zero-logit level set, equivalently the
+% 0.5-probability isosurface, with
+% marching cubes, and sample 100,000 points from both the reconstruction and
+% reference surfaces. Chamfer distance is the sum of the two mean bidirectional
+% Euclidean nearest-neighbor distances. At threshold 0.02, precision and recall are
+% the fractions of reconstructed and reference points, respectively, lying
+% within the threshold of the other surface.  F1 is their harmonic mean.
+
+% \subsection{Class-Conditioned Generation Metric Settings}
+
+% Following COD-VAE \citep{cho2025representing}, we evaluate airplane, car,
+% chair, table, and rifle and generate 2,000 shapes per category.  We report
+% minimum matching distance (MMD-CD), coverage (COV-CD), and 1-nearest-neighbor
+% accuracy (1-NNA-CD). For each category, the reference set $S_r$ is the
+% corresponding subset of the final ShapeNet evaluation split. From the 2,000
+% generated shapes, we use $5|S_r|$ for MMD-CD and COV-CD and $|S_r|$ for
+% 1-NNA-CD. Each mesh is represented
+% by 2,048 points sampled from its surface, and category-level scores are averaged
+% over the five categories.  Using CD as the set distance, MMD averages the
+% distance from each reference shape to its nearest generated shape.  COV is the
+% fraction of reference shapes selected as a nearest neighbor of at least one
+% generated shape.  1-NNA is the leave-one-out nearest-neighbor classification
+% accuracy on the union of equally sized reference and generated sets.
+
+% VecSet and COD-VAE use 18 diffusion steps, whereas 3DILG uses its native
+% 512-step autoregressive sampler.  Our EDM uses 18 Heun steps with $\rho=7$,
+% $\sigma_{\max}=80$, and $\sigma_{\min}=0.002$, without condition dropout or
+% classifier-free guidance.
+
+% \subsection{Efficiency Benchmark Protocol}
+
+% All efficiency measurements use the corresponding trained checkpoints on one
+% NVIDIA H20 GPU with batch size 16 and FP32 inference.  TF32 and Flash SDP are
+% disabled.  CUDA events measure GPU execution after warmup; model loading,
+% data loading, CPU--GPU transfers, marching cubes, and file output are excluded.
+% For reconstruction, full inference begins with the input point cloud and
+% includes point encoding, tokenizer decoding, and all $128^3$ occupancy queries
+% in chunks of 131,072 points. Decoder latency instead begins with an already
+% available stage-1 prefix and ends when the complete triplane has been
+% produced; it excludes point encoding and occupancy queries.
+
+% For generation, sampling throughput measures EDM latent generation alone.
+% Full throughput begins from the same latent noise and additionally includes
+% prefix VAE decoding, five-pass stage-1 tokenizer decoding, and the complete
+% $128^3$ occupancy-field query. Thus the point encoder is part of reconstruction
+% full inference but not of the generation pipeline. We discard three warmup
+% batches and average ten measured batches for reconstruction and decoder
+% latency; generation uses five warmup and thirty measured batches. For a
+% measured mean batch latency $t$ in milliseconds,
+% \begin{equation}
+% \mathrm{throughput}=\frac{16\times1000}{t}.
+% \end{equation}
+% Peak allocated CUDA memory is measured after resetting the peak-memory counter
+% following warmup. It is measured over the corresponding full pipeline;
+% reserved memory is not used.
+
+% \begin{table}[t]
+% \centering
+% \small
+% \setlength{\tabcolsep}{4pt}
+% \begin{tabular}{lrrr}
+% \toprule
+% Method & Tok. & Full shape/s & Peak GiB \\
+% \midrule
+% VecSet & 512 & 4.20 & 32.63 \\
+% COD-VAE & 2 & 82.48 & 2.08 \\
+% COD-VAE & 32 & 79.82 & 2.08 \\
+% COD-VAE & 64 & 77.29 & 2.09 \\
+% \midrule
+% \ours{} & 1 & 72.51 & 2.03 \\
+% \ours{} & 2 & 72.51 & 2.03 \\
+% \ours{} & 4 & 72.24 & 2.03 \\
+% \bottomrule
+% \end{tabular}
+% \caption{Full reconstruction efficiency under the common protocol.  ZipTok3D
+% uses five refinement passes.}
+% \label{tab:supp-reconstruction-efficiency}
+% \end{table}
+
+% Table~\ref{tab:supp-reconstruction-efficiency} reports the resulting
+% representation--compute tradeoff. Shorter prefixes reduce neither the dense
+% occupancy query nor the number of shared refinement calls. Consequently,
+% ZipTok3D has lower end-to-end throughput than the single-pass COD-VAE variants,
+% despite its shorter latent sequence. Peak memory remains similar because the
+% common encoder and dense-field query dominate the allocation.
+
+% \subsection{Statistical Analysis}
+
+% For the primary comparison between ZipTok3D at $K=4,L=5$ and COD-VAE-32, we
+% resample aligned TRELLIS objects with replacement. Each of 20,000 resamples
+% contains 2,613 object indices. For each metric, we compute the difference
+% between the paired sample means and report the 2.5th and 97.5th percentiles of
+% the resulting bootstrap distribution. The bootstrap uses seed 123456, and all
+% effects are defined as ZipTok3D minus COD-VAE, so negative CD is favorable.
+% These intervals quantify variation over evaluation objects conditional on the
+% trained models; they do not measure variation across independent training
+% runs.
+
+% \section{Post-Hoc Adaptive-Budget Diagnostic}
+% \label{sec:posthoc-oracle}
+
+% To characterize how the required budget varies across individual shapes, we
+% perform a post-hoc diagnostic over
+% $K\in\{1,2,4,8,16,32\}$ and $L\in\{1,\ldots,6\}$ from the same checkpoint.
+% Candidates are searched by increasing $K$ and then increasing $L$, prioritizing
+% a shorter representation before shallower decoding.  This diagnostic accesses
+% ground-truth reconstruction metrics and thus measures adaptive potential rather
+% than the performance of a deployable budget predictor.
+
+% We use a strict criterion that accepts a candidate only when
+% all three metrics are no worse than COD-VAE-32 after decimal half-up rounding
+% (one decimal for IoU/F1 and three decimals for CD).  Shapes without a successful
+% candidate are excluded from this diagnostic.  Table~\ref{tab:supp-posthoc-all}
+% reports both methods on the same successful subset, preventing differences in
+% subset composition from affecting the comparison.
+
+% \begin{table}[t]
+% \centering
+% {\small\setlength{\tabcolsep}{2pt}
+% \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}llcccc@{}}
+% \toprule
+% Data & Method & Found & Rate & Avg. $K$ & Avg. $L$ \\
+% \midrule
+% ShapeNet & COD-VAE-32 & -- & -- & 32.00 & -- \\
+% ShapeNet & \ours{} & 979/1,283 & 76.31 & 2.43 & 3.41 \\
+% TRELLIS & COD-VAE-32 & -- & -- & 32.00 & -- \\
+% TRELLIS & \ours{} & 1,767/2,613 & 67.62 & 3.02 & 3.97 \\
+% \bottomrule
+% \end{tabular*}
+% \vspace{0.35em}
+
+% \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}llccc@{}}
+% \toprule
+% Data & Method & IoU$\uparrow$ & CD$\downarrow$ & F1$\uparrow$ \\
+% \midrule
+% ShapeNet & COD-VAE-32 & 97.2 & 0.011 & 98.1 \\
+% ShapeNet & \ours{} & 97.3 & 0.011 & 98.3 \\
+% TRELLIS & COD-VAE-32 & 75.8 & 0.015 & 96.1 \\
+% TRELLIS & \ours{} & 76.6 & 0.014 & 96.6 \\
+% \bottomrule
+% \end{tabular*}}
+% \caption{All-metric post-hoc diagnostic. The \ours{} rows report the post-hoc
+% oracle. Found and Rate give the number and percentage of shapes for which the
+% search identifies an operating point that matches or exceeds COD-VAE-32 on all
+% three rounded per-shape metrics. Avg. $K$ and Avg. $L$ are computed over these
+% shapes. Metrics in the lower block are aggregated over the same subset for
+% both methods, so the COD-VAE rows are subset rather than full-split results.
+% IoU and F1 are percentages.}
+% \label{tab:supp-posthoc-all}
+% \end{table}
+
+% No candidate in the evaluated grid satisfies the strict all-metric criterion
+% for the remaining 304 ShapeNet and 846 TRELLIS objects. All fixed-budget
+% evaluations include these objects; they are excluded only from the oracle
+% averages in Table~\ref{tab:supp-posthoc-all}. Consequently, the
+% reported average budgets characterize the successful subset rather than the
+% expected cost of a deployable early-exit policy.
+
+% Among successful objects, three or four passes account for 68.3\% and 71.6\%
+% of the ShapeNet and TRELLIS subsets, respectively. This distribution is
+% consistent with the dataset-level saturation behavior in
+% Figures~\ref{fig:supp-f1-curves} and~\ref{fig:supp-cd-curves}.
+
+% \begin{figure}[t]
+% \centering
+% \includegraphics[width=\columnwidth]{supplementary_figures/adaptive_success_token_distribution.pdf}
+% \caption{First successful prefix length under the token-first all-metric
+% search.  Percentages are normalized within the successful subset of each
+% dataset.}
+% \label{fig:supp-posthoc-token-dist}
+% \end{figure}
+
+% \begin{figure}[t]
+% \centering
+% \includegraphics[width=\columnwidth]{supplementary_figures/adaptive_success_loop_distribution.pdf}
+% \caption{First successful refinement depth under the same all-metric search
+% as Figure~\ref{fig:supp-posthoc-token-dist}.}
+% \label{fig:supp-posthoc-loop-dist}
+% \end{figure}
+
+% \bibliography{aaai2027}
+% \end{document}
+
+
+\documentclass[letterpaper]{article}
+\usepackage[submission]{aaai2027}
+\usepackage[hyphens]{url}
+\usepackage{graphicx}
+\urlstyle{rm}
+\def\UrlFont{\rm}
+\usepackage{natbib}
+\usepackage{caption}
+\frenchspacing
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{array}
+
+\newcommand{\ours}{ZipTok3D}
+\pdfinfo{/TemplateVersion (2027.1)}
+
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thesubsection}{S\arabic{section}.\arabic{subsection}}
+\renewcommand{\thefigure}{\Alph{figure}}
+\renewcommand{\thetable}{\Alph{table}}
+\renewcommand{\theequation}{S\arabic{equation}}
+\setcounter{secnumdepth}{2}
+
+\title{Supplementary Material for \ours{}: High-Fidelity 3D Tokenization with Compact Token Prefixes}
+\author{Anonymous Submission}
+\affiliations{}
+
+\begin{document}
+\maketitle
+
+\section{Prefix-Length and Refinement-Depth Analysis}
+\label{sec:full-sweeps}
+
+\subsection{Complete Metric Sweeps}
+
+% We evaluate prefix lengths
+% $K\in\{1,2,4,8,16,32,64,128\}$ and refinement depths
+% $L\in\{1,2,3,4,5,6\}$ using one selected checkpoint per dataset. At every
+% operating point, the decoder receives a $K\times512$ latent tensor without
+% suffix padding.
+
+To characterize how prefix length and refinement depth jointly affect
+reconstruction, we evaluate all supported prefix lengths
+$K\in\{1,2,4,8,16,32,64,128\}$ and refinement depths
+$L\in\{1,2,3,4,5,6\}$. This extends the query-IoU analysis in the main paper
+to the complete operating range with two surface metrics. All operating
+points within each dataset use the same selected checkpoint, and the decoder
+receives the exact $K\times512$ prefix without suffix padding.
+
+\begin{figure}[!t]
+    \centering
+    \captionsetup{skip=3pt}
+    \begin{minipage}{\columnwidth}
+        \centering
+        \includegraphics[width=.90\columnwidth]
+        {supplementary_figures/mesh_f1_interactions.pdf}
+        \captionof{figure}{Mesh F1@0.02 across prefix lengths $K$ and
+        refinement depths $L$ on ShapeNet (top) and TRELLIS (bottom).}
+        \label{fig:supp-f1-curves}
+    \end{minipage}
+    \vspace{-0.4em}
+    \begin{minipage}{\columnwidth}
+        \centering
+        \includegraphics[width=.90\columnwidth]
+        {supplementary_figures/mesh_cd_interactions.pdf}
+        \captionof{figure}{Mesh CD across prefix lengths $K$ and refinement
+        depths $L$ on ShapeNet (top) and TRELLIS (bottom). Lower is better.}
+        \label{fig:supp-cd-curves}
+    \end{minipage}
+\end{figure}
+
+% Figures~\ref{fig:supp-f1-curves} and~\ref{fig:supp-cd-curves} extend the
+% query-IoU analysis to the two surface metrics. Both exhibit the same asymmetric
+% interaction: increasing $K$ is most beneficial under shallow decoding, whereas
+% increasing $L$ is most beneficial for short prefixes. The
+% differences between five and six passes are small at the reported operating
+% points across query IoU, mesh CD, and mesh F1, supporting the use of five
+% passes for evaluation.
+Figures~\ref{fig:supp-f1-curves} and~\ref{fig:supp-cd-curves} provide
+complementary axis-wise views of this interaction for mesh F1@0.02 and mesh
+CD. When refinement is shallow, increasing $K$ yields the largest gains.
+Conversely, when the prefix is short, increasing $L$ is most beneficial. This
+asymmetric interaction is observed on both datasets and is consistent with the
+query-IoU results in the main paper, showing that additional prefix tokens and
+refinement passes contribute most strongly in different regimes.
+
+Figure~\ref{fig:supp-heatmaps} reports the complete joint grids for query IoU,
+mesh F1@0.02, and mesh CD. Across the evaluated range, the full sweeps confirm
+that reconstruction is most sensitive to prefix length under shallow decoding,
+whereas the benefit of additional refinement is concentrated at small $K$.
+At the operating points used in the main paper, the differences between
+$L=5$ and $L=6$ are small across all three metrics, supporting the use of five
+refinement passes for evaluation.
+
+\begin{figure*}[!t]
+    \centering
+    {\setlength{\tabcolsep}{1.5pt}
+    \begin{tabular}{@{}cc@{}}
+    \includegraphics[width=.45\textwidth]{supplementary_heatmaps_l1_l6/shapenet_query_iou.pdf} &
+    \includegraphics[width=.45\textwidth]{supplementary_heatmaps_l1_l6/trellis_query_iou.pdf} \\[-.55em]
+    \includegraphics[width=.45\textwidth]{supplementary_heatmaps_l1_l6/shapenet_mesh_f1_0p02.pdf} &
+    \includegraphics[width=.45\textwidth]{supplementary_heatmaps_l1_l6/trellis_mesh_f1_0p02.pdf} \\[-.55em]
+    \includegraphics[width=.45\textwidth]{supplementary_heatmaps_l1_l6/shapenet_mesh_cd.pdf} &
+    \includegraphics[width=.45\textwidth]{supplementary_heatmaps_l1_l6/trellis_mesh_cd.pdf}
+    \end{tabular}}
+    \par\vspace{-.35em}
+    \includegraphics[width=.85\textwidth]{supplementary_heatmaps_l1_l6/heatmap_relative_quality_legend.pdf}
+    \par\vspace{-.25em}
+    % \caption{Complete ShapeNet (left) and TRELLIS (right) sweeps for
+    % refinement depths $L=1,\ldots,6$ and all supported prefix lengths. Rows
+    % report query IoU, mesh F1@0.02, and mesh CD. Cell values are dataset means.
+    % Colors are normalized independently within each dataset--metric panel. For
+    % IoU and F1, error is $e=100-m$, where $m$ is the reported percentage; for
+    % CD, $e=m$. Let $e_{\min}$ and $e_{\max}$ be the minimum and maximum errors
+    % over all displayed $(K,L)$ cells in that panel. The normalized color score
+    % is $q=\log(e_{\max}/e)/\log(e_{\max}/e_{\min})$, where $q=1$ denotes the
+    % best cell and $q=0$ the worst. Darker colors indicate larger $q$.}
+    \caption{Complete ShapeNet (left) and TRELLIS (right) sweeps for
+    refinement depths $L=1,\ldots,6$ and all supported prefix lengths. Rows
+    report query IoU, mesh F1@0.02, and mesh CD. Cell values are dataset means;
+    CD is reported in units of $10^{-3}$. To orient all metrics so that better
+    values receive darker colors, we define the residual from the optimum as
+    $r=100-m$ for percentage-valued IoU and F1 and as $r=m$ for CD. Within each
+    dataset--metric panel, we apply standard min--max normalization to
+    $-\log r$. If $r_{\min}$ and $r_{\max}$ are the minimum and maximum
+    residuals over its displayed $(K,L)$ cells, the resulting color score is
+    $q=\log(r_{\max}/r)/\log(r_{\max}/r_{\min})$. Thus, $q=1$ denotes the best
+    cell and $q=0$ the worst. Darker colors indicate larger $q$.}
+    
+    \label{fig:supp-heatmaps}
+\end{figure*}
+
+\subsection{Per-Object Refinement Behavior}
+
+Dataset-level mean gains do not show whether refinement benefits most objects
+or only a small subset. Table~\ref{tab:supp-refinement-diagnostics} therefore
+reports the fraction of objects whose IoU, CD, or F1 improves over an early
+refinement transition, $L=1\!\rightarrow\!3$, and a later transition,
+$L=3\!\rightarrow\!5$, at two short-prefix settings,
+$K\in\{1,4\}$.
+% Mesh
+% comparisons exclude seven
+% TRELLIS objects for which at least one reconstructed mesh in the compared pair
+% is empty or invalid, leaving 2,606 paired objects;
+% all ShapeNet meshes are
+% valid.
+%注：写这些干什么，之后不要出现这个
+%注：这段总体逻辑还可以。
+
+\par\medskip
+\noindent\begin{minipage}{\columnwidth}
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lccccc}
+\toprule
+& & & \multicolumn{3}{c}{Objects improved (\%)} \\
+\cmidrule(lr){4-6}
+Dataset & $K$ & Transition & IoU$\uparrow$ & CD$\downarrow$ & F1$\uparrow$ \\
+\midrule
+\multirow{4}{*}{ShapeNet}
+ & 1 & $1\!\rightarrow\!3$ & 100.0 & 99.3 & 97.6 \\
+ & 1 & $3\!\rightarrow\!5$ & 88.2 & 81.1 & 58.1 \\
+ & 4 & $1\!\rightarrow\!3$ & 100.0 & 98.7 & 94.8 \\
+ & 4 & $3\!\rightarrow\!5$ & 89.5 & 81.5 & 55.7 \\
+\midrule
+\multirow{4}{*}{TRELLIS}
+ & 1 & $1\!\rightarrow\!3$ & 98.6 & 99.8 & 99.8 \\
+ & 1 & $3\!\rightarrow\!5$ & 91.2 & 91.8 & 84.7 \\
+ & 4 & $1\!\rightarrow\!3$ & 98.5 & 99.7 & 99.4 \\
+ & 4 & $3\!\rightarrow\!5$ & 90.5 & 90.7 & 83.4 \\
+\bottomrule
+\end{tabular}
+% \captionof{table}{Per-object improvement rates between selected refinement
+% depths. Improvement is a strict increase for IoU and F1 and a strict decrease
+% for CD; objects that tie or regress are not counted as improved. Values are
+% rounded to one decimal place.}
+\captionof{table}{Per-object improvement rates across selected refinement
+intervals. An object is counted as improved if its IoU or F1 strictly increases
+or its CD strictly decreases. Ties and regressions remain in the denominator
+but are not counted as improvements. Values are rounded to one decimal place.}
+\label{tab:supp-refinement-diagnostics}
+\end{minipage}
+\par\medskip
+
+Across both datasets, increasing $L$ from 1 to 3 improves a large majority of
+objects on every metric, indicating that the aggregate gains are not driven by
+a small subset. Increasing $L$ further from 3 to 5 still improves more than
+half of the objects in every setting, but the improvement rates are lower and
+more metric-dependent, with the weakest consistency for ShapeNet mesh F1.
+Early refinement therefore provides broadly shared benefits, whereas later
+refinement remains useful for a smaller and more metric-dependent fraction of
+objects.
+
+\section{Experimental Setup Details}
+\label{sec:experimental-details}
+
+\subsection{Datasets, Preprocessing, and Splits}
+
+\paragraph{ShapeNet.}
+We use ShapeNetCore-v2 \citep{chang2015shapenet} with the 55-category
+preprocessing and split manifests released by 3DShape2VecSet
+\citep{zhang20233dshape2vecset} and adopted by COD-VAE
+\citep{cho2025representing}. The Stage-1 tokenizer, prefix VAE, and
+class-conditional EDM share the same partition: 48,597 objects are used for
+training, 2,592 for validation and model selection, and a disjoint 1,283-object
+test set for final evaluation. Reconstruction is evaluated on the complete test
+set, whereas generation metrics use its category-specific subsets for airplane,
+car, chair, table, and rifle. These role-based names correspond to the subsets
+stored as \emph{test} and \emph{validation}, respectively, in the released
+manifests.
+For each object, the released data provide separate pools of uniform volume
+queries and near-surface queries, their occupancy labels, a normalization
+scale, and a dense reference surface point cloud. Following COD-VAE, we
+consolidate the records by split while preserving category and object
+identifiers. All manifest entries used in the reported experiments are
+successfully converted. Query
+coordinates are stored in FP16 for training and FP32 for both held-out splits,
+while surface points remain in FP32.
+During training, independent axis scales are sampled uniformly from
+$[0.75,1.25]$, the shape is renormalized to the unit cube, and Gaussian noise
+with standard deviation 0.005 is added to the surface points before clipping
+to $[-1,1]$.  The same geometric scaling is applied to the occupancy queries.
+Neither held-out split is augmented.
+
+\paragraph{TRELLIS.}
+TRELLIS-500K \citep{xiang2025structured} provides metadata for 500,777
+training assets: 168,307 Objaverse-XL Sketchfab assets, 311,843 Objaverse-XL
+GitHub assets, 4,485 ABO assets, 9,472 3D-FUTURE assets, and 6,670 HSSD assets.
+Its separate 3,229-object Toys4K evaluation set is not used.  Our preprocessing
+starts from the available downloaded assets rather than the complete metadata
+catalogue.  We merge supported polygonal components and apply the
+point-cloud-utils watertight conversion used by the VecSet preprocessing
+pipeline at resolution 50,000 with seed 0.  The watertight mesh is centered at
+its bounding-box center and scaled so that its maximum vertex radius is one.
+Each successful object is represented by 100,000 surface points, 500,000
+volume queries sampled uniformly from the radius-$\sqrt{3}$ sphere, and
+500,000 near-surface queries divided equally between Gaussian perturbation
+scales 0.005 and 0.05. Occupancy is one where the signed distance is
+nonpositive and zero otherwise.
+Per-object sampling is deterministic from seed 42 and the object identifier.
+Inputs above 50,000 faces are decimated to that target before watertight
+conversion when decimation succeeds. The preprocessing additionally sets a
+900-second timeout and a 32-GiB memory limit per worker. An asset is excluded
+if it lacks a supported,
+nonempty polygonal mesh, contains nonfinite geometry, or fails mesh conversion,
+normalization, surface sampling, signed-distance evaluation, or the stated
+resource limits.
+
+With seed 42, the successfully preprocessed assets are partitioned into 97\%
+training, 2\% validation, and 1\% test subsets. The resulting test split
+contains 2,613 objects: 57 ABO, 856 Objaverse-XL GitHub, and 1,700
+Objaverse-XL Sketchfab assets. The anonymous code release provides the source
+category and exact object identifier of every asset in this test split, which
+is used for all reconstruction, bootstrap, and adaptive-budget analyses.
+
+\subsection{Baseline Sources and Operating Points}
+
+We compare with 3DILG \citep{zhang20223dilg}, VecSet
+\citep{zhang20233dshape2vecset}, and COD-VAE
+\citep{cho2025representing}.  These methods support deterministic
+reconstruction at fixed, shape-independent token budgets.  All ShapeNet
+comparisons use the common 1,283-object test split and the COD-VAE
+metric implementation. The ShapeNet COD-VAE-32/64 checkpoints are inherited
+from the official COD-VAE release, whereas COD-VAE-2 is trained using the
+released implementation. On TRELLIS, COD-VAE-2/32/64 are initialized from
+their corresponding ShapeNet checkpoints and fine-tuned on the common
+preprocessed training pool. These checkpoints are selected by the highest mean
+query IoU on the same validation split used by ZipTok3D.
+VecSet-512 uses the inherited ShapeNet model without TRELLIS-specific training.
+TRELLIS results are not reported for 3DILG or the shorter VecSet operating
+points. All reported TRELLIS methods use the common test split and
+evaluation protocol described above.
+
+The reconstruction comparisons use 512 tokens for 3DILG; 32, 64, and 512
+tokens for VecSet; and 2, 32, and 64 tokens for COD-VAE.  ZipTok3D is evaluated
+with exact prefixes of 1, 2, and 4 tokens.  The class-conditioned generation
+comparison uses the native stage-2 latent lengths of the baselines and the
+exact two-token stage-2 representation of ZipTok3D.
+
+\subsection{Stage-1 Optimization and Model Selection}
+\label{sec:optimization}
+
+For both datasets, each training example samples 2,048 points from the stored
+surface pool as encoder input and separately samples 4,096 volume queries and
+4,096 near-surface queries for reconstruction supervision. We optimize the
+Stage-1 tokenizer with AdamW using $\beta_1=0.9$, $\beta_2=0.999$,
+$\epsilon=10^{-8}$, weight decay 0.01, and an initial learning rate of
+$10^{-4}$. Training uses FP16 mixed precision and clips the global gradient
+norm at 0.5. Each of four A800 GPUs processes 56 examples, and gradients are
+accumulated over three steps, giving an effective batch size of 672.
+
+ShapeNet training runs for 1,000 epochs with a 50-epoch linear warmup followed
+by cosine learning-rate decay. TRELLIS training runs for 300 epochs at a
+constant learning rate. Every configuration is trained once with seed 123456.
+For ShapeNet, checkpoints are selected by the highest mean query IoU on the
+2,592-object validation split. For TRELLIS, the same criterion is evaluated on
+the validation split. The implementation
+uses Python 3.9, PyTorch 2.1.0, and CUDA 12.2. Training-time refinement and
+supervision are specified in Section~\ref{sec:training-supervision}.
+
+\subsection{Prefix VAE Optimization and Model Selection}
+
+The prefix VAE uses AdamW with learning rate $10^{-4}$,
+weight decay 0.01, global batch size 376, FP16 mixed precision, and gradient
+clipping at 0.5.  It is trained for 100 epochs, with the learning rate halved at
+epochs 60, 70, 80, and 90. It is trained on the same 48,597-object ShapeNet
+training split as the Stage-1 tokenizer. Training uses four A800 GPUs and seed
+123456. We select the checkpoint with the highest query IoU on the shared
+2,592-object ShapeNet validation split.
+
+\subsection{EDM Optimization and Model Selection}
+
+The EDM uses AdamW with learning rate $10^{-4}$, weight decay 0.05, global
+batch size 256, FP16 mixed precision, and gradient clipping at 1.0. Its
+1,000-epoch schedule uses a 40-epoch linear warmup followed by cosine decay to
+$10^{-6}$. Training uses four A800 GPUs and seed 123456. We set
+$p_{\mathrm{mean}}=-1.2$, $p_{\mathrm{std}}=1.2$, and
+$\sigma_{\mathrm{data}}=1$. The EDM is trained on latent arrays cached from the
+shared ShapeNet training split, and its checkpoint is selected by the lowest
+denoising loss on the shared validation split.
+
+\section{Architecture and Objective Specifications}
+\label{sec:architecture}
+
+\subsection{Stage-1 Tokenizer Architecture}
+
+Unless noted otherwise, the Stage-1 components follow the released COD-VAE design
+\citep{cho2025representing}. ZipTok3D introduces nested prefix training, the
+shared refinement block, and intermediate supervision.
+
+The point encoder receives 2,048 surface points and forms 512 patches by
+farthest-point sampling. It has four progressive blocks, each containing three
+self-attention layers. The encoder width is 512, with eight attention heads,
+a GEGLU MLP ratio of 4, and dropout 0.1. It produces a latent bank with maximum
+length $M=128$ and width 512. The initial latent queries are the point
+embeddings of 128 farthest-point-sampled surface positions, without a separate
+learned latent-position table.
+
+For each training example, one prefix length is sampled uniformly from
+$\{1,2,4,8,16,32,64,128\}$. All suffix positions are masked from every decoder
+attention operation. The decoder starts from 768 learned triplane tokens
+$T^0$, corresponding to three 32-channel planes at spatial resolution
+$128\times128$ with $8\times8$ patches. To predict occupancy, features are
+bilinearly sampled from the three planes, summed, and processed by a
+$32\!\rightarrow\!32\!\rightarrow\!1$ MLP with GELU.
+
+\subsection{Triplane Initialization and Selection}
+
+The selection block $\mathcal{S}_{\omega}$ first applies one cross-attention
+layer between the 768 learned triplane tokens $T^0$ and the retained prefix
+$Z_{:K}$. A LayerNorm--MLP uncertainty head assigns one score to each triplane
+token. Hard descending top-$k$ selection retains the highest-scoring 25\%, or
+192 tokens, as $H_K^0$. The remaining 576 tokens form the bypassed state
+$R_K$ and retain their spatial indices for subsequent triplane restoration.
+Selection is performed once before recurrent refinement rather than repeated
+at every pass.
+
+The ranking indices are discrete, so gradients do not propagate through the
+top-$k$ ordering itself. Reconstruction gradients propagate through the
+selected token features, while the uncertainty head receives direct
+supervision from $\mathcal{L}_{\mathrm{unc}}$ defined below. The selected
+indices are retained to restore the refined tokens to their original triplane
+locations.
+
+\subsection{Shared Refinement and Restoration}
+
+The shared refinement module is a six-layer Transformer block of width 512
+with eight attention heads, GEGLU MLP ratio 2, and dropout 0.1. It has no
+causal mask, pass embedding, or pass-specific parameters. The recurrent
+sequence at pass $\ell$ is
+\begin{equation}
+U_K^{\ell}=
+\bigl[H_K^{\ell-1};Z_{:K}\bigr]
+\in\mathbb{R}^{(192+K)\times512},
+\end{equation}
+where $H_K^{\ell-1}$ is the selected state and $Z_{:K}$ is the retained prefix.
+The shared block processes this sequence, but only its first 192 outputs define
+$H_K^{\ell}$. The prefix is reinserted unchanged at every pass, while the
+bypassed tokens $R_K$ remain fixed outside the shared block.
+
+After the final pass, the updated selected tokens are scattered to their
+recorded spatial locations and combined with the 576 bypassed tokens at their
+original locations. A linear residual head maps each restored spatial token to an
+$8\times8\times32$ patch. The resulting residual is modulated by the predicted
+uncertainty and added to the corresponding initial triplane patch.
+
+\subsection{Auxiliary Losses and Intermediate Supervision}
+\label{sec:training-supervision}
+
+The two inherited COD-VAE auxiliary losses stabilize triplane initialization
+and uncertainty-based selection. Let $a_j^0$ be the initial occupancy logit for
+query $j$, $\hat y_j^0=\sigma(a_j^0)$ its probability, and
+$\hat{\mathcal{Y}}^0=(\hat y_j^0)_{j=1}^{N_q}$ the corresponding probability
+vector. The initialization loss applies the reconstruction criterion to this
+initial prediction:
+\begin{equation}
+\mathcal{L}_{\mathrm{init}}
+=\mathcal{L}_{\mathrm{rec}}(\hat{\mathcal{Y}}^0,\mathcal{Y}).
+\end{equation}
+The uncertainty target is the detached pointwise binary cross-entropy of the
+initial prediction.  Following COD-VAE, it is clipped and normalized to
+$[0,1]$ before regression:
+\begin{align}
+r_j & =
+\frac{\operatorname{clip}(\operatorname{BCE}(\hat y_j^0,y_j)-0.01,0,0.99)}{0.99},\\
+\mathcal{L}_{\mathrm{unc}}
+&=\frac{1}{N_q}\sum_{j=1}^{N_q}(u_j-\operatorname{sg}(r_j))^2,
+\end{align}
+where $u_j$ is the uncertainty field decoded at the query. We use
+$\lambda_{\mathrm{init}}=0.5$ and $\lambda_{\mathrm{unc}}=0.001$.
+
+Stage-1 training unrolls six refinement passes. One intermediate depth is
+sampled uniformly from $\{1,\ldots,5\}$ for each minibatch, while prefix
+lengths are sampled independently for individual examples. The intermediate
+term uses $\beta=0.5$, and its reconstruction and distillation components use
+the same volume and near-surface weights, 1.0 and 0.1, as the final
+reconstruction loss. Intermediate logits and detached final logits are
+clamped to $[-30,30]$ before computing the distillation loss. The schedule
+$\alpha_t$ is updated once per optimizer step and remains fixed across the
+three microbatches accumulated into that update. Its endpoint $T_\alpha$ is
+the scheduled optimizer-step count after distributed sharding, dropping
+incomplete minibatches, and gradient accumulation. No additional
+triplane-feature distillation term is used.
+
+\subsection{Stage-2 Prefix VAE}
+
+The prefix VAE accepts up to 16 ordered stage-1 tokens.  A LayerNorm and linear
+projection independently map each 512-dimensional token to the mean and log
+variance of a 32-dimensional diagonal Gaussian posterior.  The log variance is
+clamped to $[-30,20]$, and training samples from the posterior by the
+reparameterization trick.  A linear projection maps the sampled sequence back
+to width 512, after which learned positional embeddings and a 12-layer
+Transformer reconstruct the stage-1 token features.  This Transformer uses
+eight heads, GEGLU MLP ratio 4, and dropout 0.1.  Its causal mask is
+left-to-right:
+\begin{equation}
+A_{ij}=\begin{cases}
+0, & j\leq i,\\
+-\infty, & j>i,
+\end{cases}
+\end{equation}
+so the reconstruction at position $i$ cannot use a later token.
+
+Let $\widetilde Z$ denote a posterior sample and
+$\bar Z=D_{\psi}(\widetilde Z)$ the reconstructed stage-1 token sequence.  The
+stage-1 tokenizer is frozen while the prefix VAE is jointly optimized for
+$\mathcal{B}=\{1,2,4,8,16\}$ with weights
+$w_K\in\{1.2,1.1,1.0,0.9,0.8\}$.  Its objective is
+\begin{equation}
+\begin{aligned}
+\mathcal{L}_{\mathrm{pVAE}}
+&=\sum_{K\in\mathcal{B}}
+\frac{w_K}{\sum_{K'\in\mathcal{B}}w_{K'}}
+\\[-0.2em]
+&\quad\times\Bigl[
+\operatorname{MSE}\!\left(\bar Z_{:K},\operatorname{LN}(Z_{:K})\right)
+\\[-0.2em]
+&\hspace{3.2em}
++\mathcal{L}_{\mathrm{rec}}\!\left(F_6(\bar Z_{:K}),\mathcal{Y}\right)
+\Bigr]
+\\
+&\quad+10^{-3}D_{\mathrm{KL}}\!\left(
+q_{\psi}(\widetilde Z\mid Z_{:16})\,\|\,\mathcal{N}(0,I)
+\right).
+\end{aligned}
+\end{equation}
+where $F_6$ denotes the frozen stage-1 decoder and occupancy head evaluated
+with six refinement passes.  The feature and occupancy terms both have unit
+coefficients; the volume and near-surface weighting inside
+$\mathcal{L}_{\mathrm{rec}}$ is given in
+Section~\ref{sec:training-supervision}.
+Causality ensures that every term for budget $K$ depends only on the
+corresponding stage-2 prefix. The six-pass decoder is used only to supervise
+prefix VAE training. During generation evaluation, sampled codes are decoded
+using five refinement passes.
+
+\subsection{Stage-2 Class-Conditional EDM}
+
+We cache deterministic posterior means for the full $16\times32$ latent array,
+normalize them using training-set channel statistics, and train the
+class-conditional EDM on arrays from all 55 ShapeNet training categories.
+Left-to-right causal self-attention ensures that the denoising prediction at
+each position depends only on the corresponding noisy prefix. At the reported
+two-token operating point, sampling therefore instantiates and denoises only
+the first two latent positions. The EDM and prefix VAE decoder thus operate on
+an exact $2\times32$ tensor without suffix padding.
+The EDM follows the latent-array design used by
+VecSet and COD-VAE \citep{zhang20233dshape2vecset,cho2025representing}: it has
+width 384, 16 Transformer blocks, eight 48-dimensional heads, GEGLU MLP ratio
+4, no dropout, learned token-position embeddings, and a left-to-right causal
+self-attention mask. A
+256-dimensional sinusoidal noise embedding is projected to width 384 and
+provides scale and shift to the adaptive LayerNorms in every block.  The class
+index spans all 55 ShapeNet categories. It is mapped to a learned
+384-dimensional embedding and supplied as a one-token key and value context
+through cross-attention in every block; token self-attention therefore models
+the latent sequence while class conditioning is injected separately.
+
+For a normalized latent array $x$, category $c$, and
+$\log\sigma\sim\mathcal{N}(p_{\mathrm{mean}},p_{\mathrm{std}}^2)$, the EDM
+objective is
+\begin{equation}
+\begin{aligned}
+\mathcal{L}_{\mathrm{EDM}}
+&=\mathbb{E}_{x,c,\sigma,\epsilon}\!\left[
+\frac{\sigma^2+\sigma_{\mathrm{data}}^2}
+{(\sigma\sigma_{\mathrm{data}})^2}
+\right.\\[-0.2em]
+&\hspace{4.2em}\left.
+\times\left\|D_{\theta}(x+\epsilon;\sigma,c)-x\right\|_2^2
+\right],
+\\
+&\hspace{4.2em}
+\epsilon\sim\mathcal{N}(0,\sigma^2I).
+\end{aligned}
+\end{equation}
+All latent positions present at an operating point are denoised in parallel;
+there is no token-autoregressive sampling loop.
+
+\section{Evaluation Protocols}
+\label{sec:evaluation}
+
+\subsection{Reconstruction Metric Settings}
+
+For both datasets, the encoder receives 2,048 points sampled from the stored
+surface pool of the target object. The task is therefore deterministic
+reconstruction from sampled target surfaces rather than completion from
+partial observations. For query IoU, the resulting representation is decoded
+at all 500,000 stored volume-query locations per object.
+
+For mesh evaluation, the decoder is queried on a dense $128^3$ occupancy grid.
+We extract the zero-logit level set, equivalently the 0.5-probability
+isosurface, with marching cubes. We then sample 100,000 points from the
+reconstructed mesh and compare them with the complete stored reference surface
+point cloud. Chamfer distance is the sum of the two mean bidirectional
+Euclidean nearest-neighbor distances. At threshold 0.02, precision and recall
+are the fractions of reconstructed and reference points, respectively, lying
+within the threshold of the other surface. F1 is their harmonic mean.
+
+\subsection{Class-Conditioned Generation Metric Settings}
+
+Following COD-VAE \citep{cho2025representing}, we evaluate airplane, car,
+chair, table, and rifle. We generate 2,000 shapes for each category and report
+minimum matching distance (MMD-CD), coverage (COV-CD), and 1-nearest-neighbor
+accuracy (1-NNA-CD). For a given category, the reference set $S_r$ contains all
+objects of that category in the 1,283-object ShapeNet test split. From the 2,000
+generated candidates, a deterministic subset of $5|S_r|$ shapes is used for
+MMD-CD and COV-CD, while a subset of $|S_r|$ shapes is used for 1-NNA-CD. The
+same reference sets and generated-set construction are used for every method.
+
+Each mesh is represented by 2,048 points sampled from its surface. Using CD as
+the set distance, MMD averages the distance from each reference shape to its
+nearest generated shape. COV is the fraction of reference shapes selected as a
+nearest neighbor of at least one generated shape. The fixed 5:1
+generated-to-reference ratio makes MMD-CD and COV-CD comparable across methods.
+1-NNA is the leave-one-out nearest-neighbor classification accuracy on the
+union of equally sized reference and generated sets, avoiding sample-count
+imbalance between the two sets. We report the unweighted mean of each metric
+over the five categories.
+
+VecSet and COD-VAE use 18 diffusion steps, whereas 3DILG uses its native
+512-step autoregressive sampler.  Our EDM uses 18 Heun steps with $\rho=7$,
+$\sigma_{\max}=80$, and $\sigma_{\min}=0.002$, without condition dropout or
+classifier-free guidance.
+
+\subsection{Efficiency Measurement Protocol}
+
+All efficiency measurements use the corresponding trained checkpoints on one
+NVIDIA H20 GPU with batch size 16 and FP32 inference.  TF32 and Flash SDP are
+disabled.  CUDA events measure GPU execution after warmup; model loading,
+data loading, CPU--GPU transfers, marching cubes, and file output are excluded.
+For reconstruction, full inference begins with the input point cloud and
+includes point encoding, tokenizer decoding, and all $128^3$ occupancy queries
+in chunks of 131,072 points. Decoder latency instead begins with an already
+available stage-1 prefix and ends when the complete triplane has been
+produced; it excludes point encoding and occupancy queries.
+
+For generation, sampling throughput measures EDM latent generation alone.
+Full throughput begins from the same latent noise and additionally includes
+prefix VAE decoding, five-pass stage-1 tokenizer decoding, and the complete
+$128^3$ occupancy-field query. Thus the point encoder is part of reconstruction
+full inference but not of the generation pipeline. We discard three warmup
+batches and average ten measured batches for reconstruction and decoder
+latency; generation uses five warmup and thirty measured batches. For a
+measured mean batch latency $t$ in milliseconds,
+\begin{equation}
+\mathrm{throughput}=\frac{16\times1000}{t}.
+\end{equation}
+Peak allocated CUDA memory is measured after resetting the peak-memory counter
+following warmup. It is measured over the corresponding full pipeline;
+reserved memory is not used.
+
+\subsection{Reconstruction Efficiency Results}
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrr}
+\toprule
+Method & Tok. & Full shape/s & Peak GiB \\
+\midrule
+VecSet & 512 & 4.20 & 32.63 \\
+COD-VAE & 2 & 82.48 & 2.08 \\
+COD-VAE & 32 & 79.82 & 2.08 \\
+COD-VAE & 64 & 77.29 & 2.09 \\
+\midrule
+\ours{} & 1 & 72.51 & 2.03 \\
+\ours{} & 2 & 72.51 & 2.03 \\
+\ours{} & 4 & 72.24 & 2.03 \\
+\bottomrule
+\end{tabular}
+\caption{Full reconstruction efficiency under the common protocol.  ZipTok3D
+uses five refinement passes.}
+\label{tab:supp-reconstruction-efficiency}
+\end{table}
+
+Table~\ref{tab:supp-reconstruction-efficiency} reports the resulting
+representation--compute tradeoff. Shorter prefixes reduce neither the dense
+occupancy query nor the number of shared refinement calls. Consequently,
+ZipTok3D has lower end-to-end throughput than the single-pass COD-VAE variants,
+despite its shorter latent sequence. Peak memory remains similar because the
+common encoder and dense-field query dominate the allocation.
+
+\subsection{Statistical Analysis}
+
+For the primary comparison between ZipTok3D at $K=4,L=5$ and COD-VAE-32, we
+resample aligned TRELLIS objects with replacement. Each of 20,000 resamples
+contains 2,613 object indices. For each metric, we compute the difference
+between the paired sample means and report the 2.5th and 97.5th percentiles of
+the resulting bootstrap distribution. The bootstrap uses seed 123456, and all
+effects are defined as ZipTok3D minus COD-VAE, so negative CD is favorable.
+These intervals quantify variation over evaluation objects conditional on the
+trained models; they do not measure variation across independent training
+runs.
+
+
+\section{Post-Hoc Adaptive-Budget Diagnostic}
+\label{sec:posthoc-oracle}
+
+\begin{table}[t]
+\centering
+{\small\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}llcccc@{}}
+\toprule
+Data & Method & Found & Rate & Avg. $K$ & Avg. $L$ \\
+\midrule
+ShapeNet & COD-VAE-32 & -- & -- & 32.00 & -- \\
+ShapeNet & \ours{} & 979/1,283 & 76.31 & 2.43 & 3.41 \\
+TRELLIS & COD-VAE-32 & -- & -- & 32.00 & -- \\
+TRELLIS & \ours{} & 1,767/2,613 & 67.62 & 3.02 & 3.97 \\
+\bottomrule
+\end{tabular*}
+\vspace{0.35em}
+
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}llccc@{}}
+\toprule
+Data & Method & IoU$\uparrow$ & CD$\downarrow$ & F1$\uparrow$ \\
+\midrule
+ShapeNet & COD-VAE-32 & 97.2 & 0.011 & 98.1 \\
+ShapeNet & \ours{} & 97.3 & 0.011 & 98.3 \\
+TRELLIS & COD-VAE-32 & 75.8 & 0.015 & 96.1 \\
+TRELLIS & \ours{} & 76.6 & 0.014 & 96.6 \\
+\bottomrule
+\end{tabular*}}
+\caption{All-metric post-hoc diagnostic. The \ours{} rows report the post-hoc
+oracle. Found and Rate give the number and percentage of shapes for which the
+search identifies an operating point that matches or exceeds COD-VAE-32 on all
+three rounded per-shape metrics. Avg. $K$ and Avg. $L$ are computed over these
+shapes. Metrics in the lower block are aggregated over the same subset for
+both methods, so the COD-VAE rows are subset rather than full-split results.
+IoU and F1 are percentages.}
+\label{tab:supp-posthoc-all}
+\end{table}
+
+
+
+\begin{figure}[!t]
+    \centering
+    \captionsetup{skip=3pt}
+    \begin{minipage}{\columnwidth}
+        \centering
+        \includegraphics[width=.94\columnwidth]
+        {supplementary_figures/adaptive_success_token_distribution.pdf}
+        \captionof{figure}{Distribution of the first successful prefix length
+        $K$ under the token-first all-metric search. Percentages are normalized
+        within the successful subset of each dataset.}
+        \label{fig:supp-posthoc-token-dist}
+    \end{minipage}
+    \vspace{-0.35em}
+    \begin{minipage}{\columnwidth}
+        \centering
+        \includegraphics[width=.94\columnwidth]
+        {supplementary_figures/adaptive_success_loop_distribution.pdf}
+        \captionof{figure}{Distribution of the first successful refinement
+        depth $L$ under the same search and normalization.}
+        \label{fig:supp-posthoc-loop-dist}
+    \end{minipage}
+\end{figure}
+
+To characterize how the required budget varies across individual shapes, we
+perform a post-hoc diagnostic over
+$K\in\{1,2,4,8,16,32\}$ and $L\in\{1,\ldots,6\}$ from the same checkpoint.
+Candidates are searched by increasing $K$ and then increasing $L$, prioritizing
+a shorter representation before shallower decoding.  This diagnostic accesses
+ground-truth reconstruction metrics and thus measures adaptive potential rather
+than the performance of a deployable budget predictor.
+
+We use a strict criterion that accepts a candidate only when
+all three metrics are no worse than COD-VAE-32 after decimal half-up rounding
+(one decimal for IoU/F1 and three decimals for CD).  Shapes without a successful
+candidate are excluded from this diagnostic.  Table~\ref{tab:supp-posthoc-all}
+reports both methods on the same successful subset, preventing differences in
+subset composition from affecting the comparison.
+
+
+No candidate in the evaluated grid satisfies the strict all-metric criterion
+for the remaining 304 ShapeNet and 846 TRELLIS objects. All fixed-budget
+evaluations include these objects; they are excluded only from the oracle
+averages in Table~\ref{tab:supp-posthoc-all}. Consequently, the
+reported average budgets characterize the successful subset rather than the
+expected cost of a deployable early-exit policy.
+
+Figures~\ref{fig:supp-posthoc-token-dist}
+and~\ref{fig:supp-posthoc-loop-dist} summarize the first successful budgets
+within this subset. Three or four passes account for 68.3\% and 71.6\% of the
+ShapeNet and TRELLIS subsets, respectively. This distribution is consistent
+with the dataset-level saturation behavior in
+Figures~\ref{fig:supp-f1-curves} and~\ref{fig:supp-cd-curves}.
+
+\makeatletter
+\setlength{\@fptop}{0pt}
+\makeatother
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=.95\columnwidth]
+{supplementary_figures/additional_qualitative_comparisons.png}
+\captionsetup{width=\columnwidth,skip=3pt}
+\caption{Additional reconstruction comparisons on ShapeNet (top five rows)
+and TRELLIS (bottom two rows). ZipTok3D uses $K=4$ and $L=5$; the baseline
+uses 32 COD-VAE tokens.}
+\label{fig:supp-additional-qualitative}
+\end{figure}
+
+\section{Additional Qualitative Comparisons}
+
+Figure~\ref{fig:supp-additional-qualitative} extends the qualitative comparison
+to objects with thin components, large openings, curved surfaces, and repeated
+architectural elements. The open shelf, chair, and table retain their principal
+empty regions, while the vessel and aircraft preserve separated components and
+overall topology. On TRELLIS, both reconstructions recover the multi-level
+building layouts and repeated roof or fortification structures. The remaining
+differences are concentrated around small protrusions, thin supports, roof
+eaves, and crenellations, which remain challenging under both token budgets.
+
+
+
+\clearpage
+
+\makeatletter
+\setlength{\@fptop}{0pt plus 1fil}
+\makeatother
+
+\bibliography{aaai2027}
+\end{document}
