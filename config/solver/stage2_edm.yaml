@@ -1,0 +1,16 @@
+_target_: cod.solvers.diffusion_solver.LatentDiffusionSolver
+normalizer_path: latent_cache/ziptok3d_stage2_k16_d32/normalizer.npz
+lr: 1.0e-4
+scale_lr_by_batch_size: false
+min_lr: 1.0e-6
+weight_decay: 0.05
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_eps: 1.0e-8
+warmup_epochs: 40
+p_mean: -1.2
+p_std: 1.2
+sigma_data: 1.0
+validation_seed: 2027
+metrics_jsonl_path: null
+metrics_log_interval: 20
