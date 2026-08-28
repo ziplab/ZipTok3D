@@ -1,0 +1,26 @@
+_base_: _train_base
+
+trainer:
+  max_epochs: 300
+  strategy: ddp_find_unused_parameters_true
+  log_every_n_steps: 100
+  check_val_every_n_epoch: 1
+  precision: 16-mixed
+  gradient_clip_val: 0.5
+  accumulate_grad_batches: 3
+
+checkpoint:
+  save_top_k: 3
+  mode: max
+
+data:
+  _base_: data/trellis
+
+model:
+  _base_: model/ae_ziptok3d
+
+solver:
+  _base_: solver/ae_ziptok3d
+  use_cosine_annealing: false
+  warmup_epochs: 0
+  metrics_jsonl_path: null

@@ -1,0 +1,25 @@
+_base_: _train_base
+
+trainer:
+  max_epochs: 1000
+  strategy: ddp_find_unused_parameters_false
+  log_every_n_steps: 20
+  check_val_every_n_epoch: 5
+  precision: 16-mixed
+  gradient_clip_val: 1.0
+  accumulate_grad_batches: 2
+
+checkpoint:
+  filename: best-{epoch}-{score:.6f}
+  save_top_k: 3
+  mode: min
+  save_weights_only: false
+
+data:
+  _base_: data/latent_cache
+
+model:
+  _base_: model/stage2_edm
+
+solver:
+  _base_: solver/stage2_edm
