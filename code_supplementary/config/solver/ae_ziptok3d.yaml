@@ -1,0 +1,32 @@
+_target_: cod.solvers.ae_solver.AutoencoderSolver
+lr: 1.0e-4
+scale_lr_by_batch_size: false
+weight_decay: 0.01
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_eps: 1.0e-8
+use_cosine_annealing: true
+warmup_epochs: 50
+eval_chunk_size: 250000
+
+coeff_recon: 1.0
+coeff_init: 0.5
+coeff_uncertainty: 0.001
+val_vis_interval: 10
+
+elt_distill: true
+elt_min_loop: 1
+elt_max_loop: 6
+elt_distill_weight: 0.5
+elt_distill_loss: bce
+elt_distill_weight_step: 0.0
+elt_distill_weight_max: 0.5
+elt_schedule_interval: 5
+elt_plane_warmup_epochs: 0
+elt_plane_distill_weight: 0.0
+elt_plane_distill_weight_step: 0.0
+elt_plane_distill_weight_max: 0.0
+elt_loop_warmup_start_min_loop: 1
+max_logit_abs: 30.0
+metrics_jsonl_path: null
+metrics_log_interval: 50

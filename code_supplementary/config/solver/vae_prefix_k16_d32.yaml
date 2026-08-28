@@ -1,0 +1,16 @@
+_target_: cod.solvers.stage2_solver.VAEStage2Solver
+autoencoder_checkpoint_path: null
+lr: 1.0e-4
+scale_lr_by_batch_size: false
+weight_decay: 0.01
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_eps: 1.0e-8
+eval_chunk_size: 250000
+val_vis_interval: 20
+coeff_feat: 1.0
+coeff_kl: 0.001
+coeff_recon: 1.0
+prefix_budgets: [1, 2, 4, 8, 16]
+prefix_loss_weights: [1.2, 1.1, 1.0, 0.9, 0.8]
+num_decode_loops: 6
