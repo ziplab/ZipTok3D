@@ -1,0 +1,27 @@
+_target_: cod.models.vae.CompactLatentAutoencoder
+
+output_dim: 1
+num_latents: 128
+embed_dim: 512
+query_dim: 32
+use_learnable_pos: false
+
+encoder_params:
+  num_patches: 512
+  num_blocks: 4
+  num_layers_per_block: 3
+  # The constructor uses the upstream spelling for this option.
+  whether_casual: false
+
+decoder_params:
+  output_resolution: 128
+  output_patch_size: 8
+  num_layers: 6
+  num_loops: 6
+  num_init_layers: 1
+  num_register: 0
+  mlp_ratio: 2
+  keep_ratio: 0.25
+  use_conv_refine: false
+
+nested_dropout_strategy: prefix_budget_uniform

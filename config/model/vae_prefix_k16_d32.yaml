@@ -1,0 +1,11 @@
+_base_: ae_ziptok3d
+_target_: cod.models.vae.CompactLatentVAE
+
+latent_dim: 32
+num_latent_layers: 12
+mlp_ratio: 4.0
+num_heads: 8
+dropout: 0.1
+active_num_latents: 16
+latent_causal: true
+use_latent_pos_embedding: true
