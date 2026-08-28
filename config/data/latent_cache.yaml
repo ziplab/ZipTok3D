@@ -1,0 +1,13 @@
+_target_: cod.data.latent_cache.ShapeNetLatentDataModule
+cache_dir: latent_cache/ziptok3d_stage2_k16_d32
+batch_size: 32
+eval_batch_size: 64
+num_workers: 8
+prefetch_factor: 2
+train_repeat: 1
+pin_memory: true
+persistent_workers: true
+# Physical source names follow ShapeNet: test is paper validation and val is
+# paper test/evaluation.
+model_selection_split: test
+evaluation_split: val

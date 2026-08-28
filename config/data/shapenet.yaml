@@ -1,0 +1,21 @@
+_target_: cod.data.shapenet.ShapeNetOccupancyDataModule
+root_dir: datasets/shapenet
+
+batch_size: 32
+eval_batch_size: 1
+num_workers: 8
+prefetch_factor: 2
+# Physical source names: test is the 2,592-object paper validation split,
+# while val is the 1,283-object paper test split.
+model_selection_split: test
+evaluation_split: val
+
+raw_root_dir: datasets/shapenet_vecset
+
+num_query_points: 4096
+pc_size: 2048
+chunk_size: 5000
+oversample_ratio: 3
+use_queries: true
+use_full_surface: false
+repeat: 16
