@@ -1,0 +1,17 @@
+_target_: cod.models.diffusion.stage2_edm.SABERStage2EDM
+num_latents: 16
+channels: 32
+num_classes: 55
+width: 384
+num_heads: 8
+head_dim: 48
+depth: 16
+time_channels: 256
+mlp_ratio: 4.0
+dropout: 0.0
+sigma_min: 0.0
+sigma_max: .inf
+sigma_data: 1.0
+causal: true
+use_token_pos_embedding: true
+gradient_checkpointing: true
