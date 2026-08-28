@@ -1,0 +1,4 @@
+_base_: train_codvae_k32_shapenet
+
+model:
+  num_latents: 2

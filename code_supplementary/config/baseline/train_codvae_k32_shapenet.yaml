@@ -1,0 +1,31 @@
+_base_: ../train_ziptok3d_shapenet
+
+trainer:
+  max_epochs: 100
+  strategy: ddp
+  accumulate_grad_batches: 2
+
+checkpoint:
+  save_top_k: 1
+
+data:
+  batch_size: 32
+  eval_batch_size: 1
+
+model:
+  num_latents: 32
+  nested_dropout_strategy: null
+  decoder_params:
+    num_layers: 12
+    num_loops: 1
+    num_register: 1
+
+solver:
+  use_cosine_annealing: false
+  warmup_epochs: 0
+  coeff_init: 1.0
+  coeff_uncertainty: 0.01
+  elt_distill: false
+  elt_min_loop: 1
+  elt_max_loop: 1
+  metrics_jsonl_path: null

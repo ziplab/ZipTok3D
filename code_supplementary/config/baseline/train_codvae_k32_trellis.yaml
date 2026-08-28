@@ -1,0 +1,6 @@
+_base_: train_codvae_k32_shapenet
+
+data:
+  _base_: ../data/trellis
+  batch_size: 32
+  eval_batch_size: 1
