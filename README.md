@@ -166,3 +166,38 @@ python -m unittest discover -s tests
 
 The audit rejects model/data artifacts, private absolute paths, unresolved
 configuration references, and an incomplete TRELLIS evaluation manifest.
+
+## Citation
+
+If you find ZipTok3D useful, please consider citing:
+
+```bibtex
+@misc{lin2026ziptok3d,
+  title        = {ZipTok3D: High-Fidelity 3D Tokenization with Compact Token Prefixes},
+  author       = {Lin, Mingda and Wang, Weijie and Zhang, Zeyu and
+                  Cui, Bowen and He, Yefei and Zhao, Haoyu and He, Yuanyu and
+                  Chen, Donny Y. and Chen, Feng and Zhuang, Bohan},
+  year         = {2026},
+  howpublished = {Technical report},
+  url          = {https://forthloth.github.io/ziptok3d/}
+}
+```
+
+## Contact
+
+Please use the [issue tracker](https://github.com/ziplab/ZipTok3D/issues) for
+questions, bug reports, or reproduction issues.
+
+## Acknowledgements
+
+This project builds on public 3D shape-tokenization and neural-field
+implementations, including COD-VAE and TRELLIS-500K. The repository also
+includes 3DShape2VecSet and 3DILG source snapshots for comparison. We thank
+the authors for making their work available.
+
+## License
+
+This repository is intended for academic research and evaluation. The
+third-party components under `external/` retain their original licenses; see
+[`THIRD_PARTY.md`](THIRD_PARTY.md) and the corresponding `LICENSE` files.
+`pointops` is an external dependency and is not redistributed here.
