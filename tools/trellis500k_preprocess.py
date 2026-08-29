@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Prepare TRELLIS-500K polygonal assets for ZipTok3D.
 
-The pipeline deliberately separates four operations so that a multi-day run
-is resumable and auditable:
+The pipeline exposes four operations that remain resumable and auditable:
 
 1. ``manifest`` normalizes the metadata emitted by the official TRELLIS
    download toolkit.
@@ -11,6 +10,10 @@ is resumable and auditable:
 3. ``split`` keeps every successful item, records every failure, and creates
    deterministic train/validation/test manifests.
 4. ``pack`` writes sharded HDF5 files consumed by ``cod.data.trellis``.
+
+The ``all`` command orchestrates the same four operations for a standard
+single-rank run. The individual commands remain available for distributed
+processing or restarting one stage independently.
 
 The geometric procedure follows the same watertight unit-sphere preprocessing
 used for the ShapeNet-style SDF records. An asset is excluded only after a
@@ -93,7 +96,13 @@ def parse_key_value(values: Sequence[str], option: str) -> Dict[str, str]:
         if "=" not in value:
             raise SystemExit(f"{option} expects SOURCE=PATH, got {value!r}")
         key, path = value.split("=", 1)
-        result[canonical_source(key)] = path
+        key = canonical_source(key)
+        path = path.strip()
+        if not key or not path:
+            raise SystemExit(f"{option} expects a non-empty SOURCE=PATH, got {value!r}")
+        if key in result:
+            raise SystemExit(f"{option} contains duplicate source {key!r}")
+        result[key] = path
     return result
 
 
@@ -128,7 +137,13 @@ def first_nonempty(row: Mapping[str, str], names: Sequence[str]) -> Optional[str
 
 def command_manifest(args: argparse.Namespace) -> None:
     metadata = parse_key_value(args.metadata, "--metadata")
-    roots = parse_key_value(args.asset_root, "--asset-root")
+    roots = parse_key_value(getattr(args, "asset_root", None) or [], "--asset-root")
+    unknown_roots = sorted(set(roots) - set(metadata))
+    if unknown_roots:
+        raise SystemExit(
+            "--asset-root contains sources without matching --metadata: "
+            + ", ".join(unknown_roots)
+        )
     records: List[dict] = []
     seen = set()
     source_counts: Dict[str, int] = {}
@@ -542,6 +557,8 @@ def _latest_statuses(records_dir: Path) -> Dict[str, dict]:
 def command_process(args: argparse.Namespace) -> None:
     if args.world_size < 1 or not 0 <= args.rank < args.world_size:
         raise SystemExit("require world_size >= 1 and 0 <= rank < world_size")
+    if args.log_interval < 1:
+        raise ValueError("--log-interval must be greater than zero")
     output_dir = Path(args.output_dir).resolve()
     records_dir = output_dir / "records"
     records_dir.mkdir(parents=True, exist_ok=True)
@@ -639,6 +656,13 @@ def command_split(args: argparse.Namespace) -> None:
 
     output_dir = Path(args.output_dir).resolve()
     latest = _latest_statuses(output_dir / "records")
+    manifest_path = getattr(args, "manifest", None)
+    if manifest_path:
+        active_ids = {
+            str(row["object_id"])
+            for row in read_jsonl(Path(manifest_path).expanduser().resolve())
+        }
+        latest = {key: value for key, value in latest.items() if key in active_ids}
     successes = {
         key: value for key, value in latest.items()
         if value.get("status") == "success" and Path(value.get("output_path", "")).is_file()
@@ -716,6 +740,8 @@ def command_pack(args: argparse.Namespace) -> None:
     import h5py
     import numpy as np
 
+    if args.shard_size < 1:
+        raise ValueError("--shard-size must be greater than zero")
     split_csv = Path(args.split_csv).resolve()
     output_dir = Path(args.output_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -781,6 +807,127 @@ def command_pack(args: argparse.Namespace) -> None:
     print(json.dumps({"items": len(rows), "index": str(index_path)}, indent=2))
 
 
+def command_all(args: argparse.Namespace) -> None:
+    """Run manifest, process, split, and pack as one standard pipeline."""
+    work_dir = Path(args.work_dir).expanduser().resolve()
+    manifest_path = (
+        Path(args.manifest).expanduser().resolve()
+        if args.manifest
+        else work_dir / "manifest.jsonl"
+    )
+    packed_dir = (
+        Path(args.packed_dir).expanduser().resolve()
+        if args.packed_dir
+        else work_dir.parent / "packed"
+    )
+
+    print("[1/4] normalizing metadata", flush=True)
+    command_manifest(
+        argparse.Namespace(
+            metadata=args.metadata,
+            asset_root=args.asset_root,
+            output=str(manifest_path),
+        )
+    )
+
+    print("[2/4] preprocessing assets", flush=True)
+    command_process(
+        argparse.Namespace(
+            manifest=str(manifest_path),
+            output_dir=str(work_dir),
+            rank=0,
+            world_size=1,
+            resume=args.resume,
+            retry_failures=args.retry_failures,
+            blender=args.blender,
+            blender_script=args.blender_script,
+            watertight_resolution=args.watertight_resolution,
+            max_input_faces=args.max_input_faces,
+            surface_points=args.surface_points,
+            volume_points=args.volume_points,
+            near_points=args.near_points,
+            near_stds=args.near_stds,
+            sdf_chunk=args.sdf_chunk,
+            timeout_seconds=args.timeout_seconds,
+            memory_limit_gb=args.memory_limit_gb,
+            seed=args.seed,
+            log_interval=args.log_interval,
+        )
+    )
+
+    print("[3/4] creating deterministic splits", flush=True)
+    command_split(
+        argparse.Namespace(
+            output_dir=str(work_dir),
+            manifest=str(manifest_path),
+            test_identifiers=args.test_identifiers,
+            expected_test_size=args.expected_test_size,
+            seed=args.seed,
+            test_fraction=args.test_fraction,
+            validation_fraction=args.validation_fraction,
+        )
+    )
+
+    print("[4/4] packing train, val, and test shards", flush=True)
+    for split_name in ("train", "val", "test"):
+        command_pack(
+            argparse.Namespace(
+                split_csv=str(work_dir / "splits" / f"{split_name}.csv"),
+                output_dir=str(packed_dir),
+                split_name=split_name,
+                shard_size=args.shard_size,
+            )
+        )
+
+    print(
+        json.dumps(
+            {
+                "manifest": str(manifest_path),
+                "work_dir": str(work_dir),
+                "packed_dir": str(packed_dir),
+            },
+            indent=2,
+        )
+    )
+
+
+def _add_process_arguments(parser: argparse.ArgumentParser, *, include_sharding: bool) -> None:
+    """Add processing flags shared by the standalone and all-in-one commands."""
+    if include_sharding:
+        parser.add_argument("--rank", type=int, default=0)
+        parser.add_argument("--world-size", type=int, default=1)
+    parser.add_argument("--resume", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--retry-failures", action="store_true")
+    parser.add_argument(
+        "--blender", default=None,
+        help="optional Blender executable for unsupported formats",
+    )
+    parser.add_argument(
+        "--blender-script",
+        default=str(Path(__file__).with_name("trellis_blender_export.py")),
+    )
+    parser.add_argument("--watertight-resolution", type=int, default=50_000)
+    parser.add_argument(
+        "--max-input-faces", type=int, default=50_000,
+        help="best-effort decimation cap before watertight conversion; <= 0 disables it",
+    )
+    parser.add_argument("--surface-points", type=int, default=100_000)
+    parser.add_argument("--volume-points", type=int, default=500_000)
+    parser.add_argument("--near-points", type=int, default=500_000)
+    parser.add_argument("--near-stds", type=float, nargs="+", default=(0.005, 0.05))
+    parser.add_argument("--sdf-chunk", type=int, default=100_000)
+    parser.add_argument(
+        "--timeout-seconds", type=float, default=900.0,
+        help="per-item wall-clock limit; set <= 0 to disable process isolation",
+    )
+    parser.add_argument(
+        "--memory-limit-gb", type=float, default=32.0,
+        help="per-item virtual-memory limit on platforms supporting resource limits",
+    )
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--log-interval", type=int, default=10)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -800,39 +947,15 @@ def build_parser() -> argparse.ArgumentParser:
     process = subparsers.add_parser("process", help="watertight and sample one manifest shard")
     process.add_argument("--manifest", required=True)
     process.add_argument("--output-dir", required=True)
-    process.add_argument("--rank", type=int, default=0)
-    process.add_argument("--world-size", type=int, default=1)
-    process.add_argument("--resume", action=argparse.BooleanOptionalAction, default=True)
-    process.add_argument("--retry-failures", action="store_true")
-    process.add_argument("--blender", default=None, help="optional Blender executable for unsupported formats")
-    process.add_argument(
-        "--blender-script",
-        default=str(Path(__file__).with_name("trellis_blender_export.py")),
-    )
-    process.add_argument("--watertight-resolution", type=int, default=50_000)
-    process.add_argument(
-        "--max-input-faces", type=int, default=50_000,
-        help="best-effort decimation cap before watertight conversion; <= 0 disables it",
-    )
-    process.add_argument("--surface-points", type=int, default=100_000)
-    process.add_argument("--volume-points", type=int, default=500_000)
-    process.add_argument("--near-points", type=int, default=500_000)
-    process.add_argument("--near-stds", type=float, nargs="+", default=(0.005, 0.05))
-    process.add_argument("--sdf-chunk", type=int, default=100_000)
-    process.add_argument(
-        "--timeout-seconds", type=float, default=900.0,
-        help="per-item wall-clock limit; set <= 0 to disable process isolation",
-    )
-    process.add_argument(
-        "--memory-limit-gb", type=float, default=32.0,
-        help="per-item virtual-memory limit on platforms supporting resource limits",
-    )
-    process.add_argument("--seed", type=int, default=42)
-    process.add_argument("--log-interval", type=int, default=10)
+    _add_process_arguments(process, include_sharding=True)
     process.set_defaults(func=command_process)
 
     split = subparsers.add_parser("split", help="filter failures and create deterministic splits")
     split.add_argument("--output-dir", required=True)
+    split.add_argument(
+        "--manifest", default=None,
+        help="optional current manifest; filters out stale status records from earlier runs",
+    )
     split.add_argument(
         "--test-identifiers", "--paper-eval-manifest", dest="test_identifiers",
         default=None,
@@ -862,6 +985,45 @@ def build_parser() -> argparse.ArgumentParser:
     pack.add_argument("--split-name", choices=("train", "val", "test"), default=None)
     pack.add_argument("--shard-size", type=int, default=256)
     pack.set_defaults(func=command_pack)
+
+    all_in_one = subparsers.add_parser(
+        "all", aliases=("prepare",),
+        help="run manifest, process, split, and pack in one standard single-rank run",
+    )
+    all_in_one.add_argument(
+        "--metadata", action="append", required=True, metavar="SOURCE=CSV",
+        help="official TRELLIS metadata CSV; repeat once per source",
+    )
+    all_in_one.add_argument(
+        "--asset-root", action="append", default=[], metavar="SOURCE=DIR",
+        help="root for relative local_path values; repeat to match metadata sources",
+    )
+    all_in_one.add_argument(
+        "--work-dir", default="datasets/trellis500k/work",
+        help="working directory for manifest, processed records, and splits",
+    )
+    all_in_one.add_argument(
+        "--manifest", default=None,
+        help="optional manifest output path (default: WORK_DIR/manifest.jsonl)",
+    )
+    all_in_one.add_argument(
+        "--packed-dir", default="datasets/trellis500k/packed",
+        help="directory for train/val/test HDF5 shards",
+    )
+    all_in_one.add_argument(
+        "--test-identifiers", "--paper-eval-manifest", dest="test_identifiers",
+        default=None,
+        help="optional CSV used to verify the deterministic paper test split",
+    )
+    all_in_one.add_argument(
+        "--expected-test-size", type=int, default=PAPER_TEST_SIZE,
+        help="required row count when --test-identifiers is supplied",
+    )
+    all_in_one.add_argument("--test-fraction", type=float, default=0.01)
+    all_in_one.add_argument("--validation-fraction", type=float, default=0.02)
+    all_in_one.add_argument("--shard-size", type=int, default=256)
+    _add_process_arguments(all_in_one, include_sharding=False)
+    all_in_one.set_defaults(func=command_all)
     return parser
 
 

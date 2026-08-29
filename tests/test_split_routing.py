@@ -4,6 +4,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from tools import trellis500k_preprocess
 
@@ -144,6 +145,126 @@ class ShapeNetSplitRoutingTests(unittest.TestCase):
         self.assertIn(
             "load_model_weights_from_checkpoint(args.init_checkpoint)", source
         )
+
+    def test_all_command_runs_four_stages_and_three_packs(self):
+        args = trellis500k_preprocess.build_parser().parse_args([
+            "all",
+            "--metadata", "abo=abo.csv",
+            "--metadata", "hssd=hssd.csv",
+            "--asset-root", "abo=abo-assets",
+            "--work-dir", "work",
+            "--packed-dir", "packed",
+            "--test-identifiers", "test.csv",
+        ])
+        calls = []
+
+        def record(name):
+            def _call(stage_args):
+                calls.append((name, stage_args))
+            return _call
+
+        with mock.patch.object(
+            trellis500k_preprocess, "command_manifest", record("manifest")
+        ), mock.patch.object(
+            trellis500k_preprocess, "command_process", record("process")
+        ), mock.patch.object(
+            trellis500k_preprocess, "command_split", record("split")
+        ), mock.patch.object(
+            trellis500k_preprocess, "command_pack", record("pack")
+        ):
+            trellis500k_preprocess.command_all(args)
+
+        self.assertEqual(
+            [name for name, _ in calls],
+            ["manifest", "process", "split", "pack", "pack", "pack"],
+        )
+        self.assertEqual(calls[0][1].metadata, ["abo=abo.csv", "hssd=hssd.csv"])
+        self.assertEqual(calls[1][1].world_size, 1)
+        self.assertEqual(calls[2][1].test_identifiers, "test.csv")
+        self.assertEqual(
+            [stage_args.split_name for name, stage_args in calls[3:]],
+            ["train", "val", "test"],
+        )
+
+    def test_prepare_alias_uses_all_command(self):
+        args = trellis500k_preprocess.build_parser().parse_args([
+            "prepare", "--metadata", "abo=abo.csv",
+        ])
+        self.assertIs(args.func, trellis500k_preprocess.command_all)
+
+    def test_all_command_stops_when_a_stage_fails(self):
+        args = trellis500k_preprocess.build_parser().parse_args([
+            "all", "--metadata", "abo=abo.csv",
+        ])
+        calls = []
+
+        def fail_process(stage_args):
+            calls.append("process")
+            raise RuntimeError("preprocess failed")
+
+        with mock.patch.object(
+            trellis500k_preprocess, "command_manifest",
+            lambda stage_args: calls.append("manifest"),
+        ), mock.patch.object(
+            trellis500k_preprocess, "command_process", fail_process
+        ), mock.patch.object(
+            trellis500k_preprocess, "command_split",
+        ) as split, mock.patch.object(
+            trellis500k_preprocess, "command_pack",
+        ) as pack:
+            with self.assertRaisesRegex(RuntimeError, "preprocess failed"):
+                trellis500k_preprocess.command_all(args)
+
+        self.assertEqual(calls, ["manifest", "process"])
+        split.assert_not_called()
+        pack.assert_not_called()
+
+    @unittest.skipUnless(NUMPY_AVAILABLE, "TRELLIS split execution requires NumPy")
+    def test_split_manifest_filters_statuses_from_older_runs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            records_dir = root / "records"
+            status_rows = []
+            manifest_rows = []
+            for index in range(101):
+                object_id = f"abo__colon__{index:03d}"
+                output = root / "processed" / f"{index:03d}.npz"
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.touch()
+                status_rows.append({
+                    "status": "success",
+                    "stage": "complete",
+                    "source": "abo",
+                    "object_id": object_id,
+                    "output_path": str(output),
+                })
+                if index < 100:
+                    manifest_rows.append({"object_id": object_id})
+            trellis500k_preprocess.write_jsonl(
+                records_dir / "status-rank-00000.jsonl", status_rows
+            )
+            manifest = root / "manifest.jsonl"
+            trellis500k_preprocess.write_jsonl(manifest, manifest_rows)
+
+            args = argparse.Namespace(
+                output_dir=str(root),
+                manifest=str(manifest),
+                validation_fraction=0.02,
+                test_fraction=0.01,
+                seed=42,
+                test_identifiers=None,
+                expected_test_size=1,
+            )
+            trellis500k_preprocess.command_split(args)
+
+            split_ids = []
+            for name in ("train", "val", "test"):
+                with (root / "splits" / f"{name}.csv").open(
+                    "r", encoding="utf-8", newline=""
+                ) as stream:
+                    split_ids.extend(row["object_id"] for row in csv.DictReader(stream))
+            self.assertEqual(len(split_ids), 100)
+            self.assertNotIn("abo__colon__100", split_ids)
 
 
 if __name__ == "__main__":

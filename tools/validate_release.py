@@ -189,6 +189,12 @@ def main():
             "split = args.split or dm.evaluation_split",
         ),
         "tools/trellis500k_preprocess.py": (
+            "def command_all",
+            '"all", aliases=("prepare",)',
+            "command_manifest(",
+            "command_process(",
+            "command_split(",
+            "command_pack(",
             '"--test-fraction", type=float, default=0.01',
             '"--validation-fraction", type=float, default=0.02',
             '"--test-identifiers", "--paper-eval-manifest"',

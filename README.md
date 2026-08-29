@@ -73,30 +73,33 @@ python preprocess_dataset.py --data shapenet
 
 ### TRELLIS-500K
 
-Run the four preprocessing stages. Repeat `--metadata` and `--asset-root` for
-each available source:
+The `all` command (also available as `prepare`) runs metadata normalization,
+asset processing, deterministic splitting, and HDF5 packing in one resumable
+single-rank run. Repeat
+`--metadata` and `--asset-root` for each available source:
 
 ```bash
-python tools/trellis500k_preprocess.py manifest \
-  --metadata <source>=<metadata.csv> \
-  --asset-root <source>=<downloaded-assets> \
-  --output datasets/trellis500k/work/manifest.jsonl
-
-python tools/trellis500k_preprocess.py process \
-  --manifest datasets/trellis500k/work/manifest.jsonl \
-  --output-dir datasets/trellis500k/work
-
-python tools/trellis500k_preprocess.py split \
-  --output-dir datasets/trellis500k/work \
+python tools/trellis500k_preprocess.py all \
+  --metadata objaverse_xl_sketchfab=<metadata.csv> \
+  --metadata objaverse_xl_github=<metadata.csv> \
+  --metadata abo=<metadata.csv> \
+  --metadata 3d_future=<metadata.csv> \
+  --metadata hssd=<metadata.csv> \
+  --asset-root objaverse_xl_sketchfab=<downloaded-assets> \
+  --asset-root objaverse_xl_github=<downloaded-assets> \
+  --asset-root abo=<downloaded-assets> \
+  --asset-root 3d_future=<downloaded-assets> \
+  --asset-root hssd=<downloaded-assets> \
+  --work-dir datasets/trellis500k/work \
+  --packed-dir datasets/trellis500k/packed \
   --test-identifiers assets/trellis_eval_split_manifest.csv
-
-python tools/trellis500k_preprocess.py pack \
-  --split-csv datasets/trellis500k/work/splits/train.csv \
-  --output-dir datasets/trellis500k/packed --split-name train
 ```
 
-Run `pack` again for `val` and `test`. Blender is optional for mesh formats that
-`trimesh` cannot read; pass its executable with `--blender`.
+The original `manifest`, `process`, `split`, and `pack` subcommands remain
+available when processing ranks independently or restarting one stage. Use
+those commands after all ranks finish when running distributed preprocessing.
+Blender is optional for mesh formats that `trimesh` cannot read; pass its
+executable with `--blender`.
 
 ## Train and evaluate
 
