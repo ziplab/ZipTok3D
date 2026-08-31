@@ -1,8 +1,46 @@
-# ZipTok3D Supplementary Code
+<p align="center">
+  <h1 align="center">ZipTok3D: High-Fidelity 3D Tokenization with Compact Token Prefixes</h1>
+  <p align="center">
+    <a href="https://github.com/forthloth">Mingda Lin<sup>†</sup></a>
+    ·
+    <a href="https://lhmd.top">Weijie Wang<sup>†,*</sup></a>
+    ·
+    <a href="https://steve-zeyu-zhang.github.io">Zeyu Zhang</a>
+    ·
+    <a href="https://alexandertsui.github.io/">Bowen Cui</a>
+    ·
+    <a href="https://hexy.tech/">Yefei He</a>
+    ·
+    <a href="https://zhao-haoyu.github.io/">Haoyu Zhao</a>
+    ·
+    <a href="https://github.com/Yuanyu0">Yuanyu He</a>
+    ·
+    <a href="https://donydchen.github.io">Donny Y. Chen</a>
+    ·
+    <a href="https://chenfeng1271.github.io/">Feng Chen<sup>*</sup></a>
+    ·
+    <a href="https://bohanzhuang.github.io">Bohan Zhuang</a>
+  </p>
+  <h3 align="center">
+    <a href="https://forthloth.github.io/ziptok3d/paper/ArXiv_ZipTok3D.pdf">Paper</a>
+    |
+    <a href="https://forthloth.github.io/ziptok3d/">Project Page</a>
+    |
+    <a href="https://github.com/ziplab/ZipTok3D">Code</a>
+  </h3>
+</p>
+
+<p align="center">
+  <a href="https://forthloth.github.io/ziptok3d/">
+    <img src="assets/mainfig.png" alt="ZipTok3D overview" width="100%">
+  </a>
+</p>
+
+<p align="center"><sup>†</sup> Equal contribution. <sup>*</sup> Corresponding authors.</p>
 
 This repository contains the training, preprocessing, reconstruction, generation,
-and evaluation code for **ZipTok3D: High-Fidelity 3D Tokenization with Compact
-Token Prefixes**. Datasets and trained checkpoints are not included.
+and evaluation code for **ZipTok3D**. Datasets and trained checkpoints are not
+included.
 
 ## Install
 
