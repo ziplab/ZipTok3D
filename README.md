@@ -36,8 +36,6 @@
   </a>
 </p>
 
-<p align="center"><sup>†</sup> Equal contribution. <sup>*</sup> Corresponding authors.</p>
-
 This repository contains the training, preprocessing, reconstruction, generation,
 and evaluation code for **ZipTok3D**. Datasets and trained checkpoints are not
 included.
