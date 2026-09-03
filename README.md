@@ -37,8 +37,7 @@
 </p>
 
 This repository contains the training, preprocessing, reconstruction, generation,
-and evaluation code for **ZipTok3D**. Datasets and trained checkpoints are not
-included.
+and evaluation code for **ZipTok3D**.
 
 ## Install
 
@@ -208,14 +207,14 @@ configuration references, and an incomplete TRELLIS evaluation manifest.
 If you find ZipTok3D useful, please consider citing:
 
 ```bibtex
-@misc{lin2026ziptok3d,
+@article{lin2026ziptok3d,
   title        = {ZipTok3D: High-Fidelity 3D Tokenization with Compact Token Prefixes},
   author       = {Lin, Mingda and Wang, Weijie and Zhang, Zeyu and
                   Cui, Bowen and He, Yefei and Zhao, Haoyu and He, Yuanyu and
                   Chen, Donny Y. and Chen, Feng and Zhuang, Bohan},
+  journal      = {arXiv preprint arXiv:2609.01740},
   year         = {2026},
-  howpublished = {Technical report},
-  url          = {https://forthloth.github.io/ziptok3d/}
+  url          = {https://arxiv.org/abs/2609.01740}
 }
 ```
 
@@ -237,4 +236,3 @@ This repository is intended for academic research and evaluation. The
 third-party components under `external/` retain their original licenses; see
 [`THIRD_PARTY.md`](THIRD_PARTY.md) and the corresponding `LICENSE` files.
 `pointops` is an external dependency and is not redistributed here.
-
