@@ -22,7 +22,7 @@
     <a href="https://bohanzhuang.github.io">Bohan Zhuang</a>
   </p>
   <h3 align="center">
-    <a href="https://forthloth.github.io/ziptok3d/paper/ArXiv_ZipTok3D.pdf">Paper</a>
+    <a href="">Paper</a>
     |
     <a href="https://forthloth.github.io/ziptok3d/">Project Page</a>
     |
