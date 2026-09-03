@@ -213,8 +213,7 @@ If you find ZipTok3D useful, please consider citing:
                   Cui, Bowen and He, Yefei and Zhao, Haoyu and He, Yuanyu and
                   Chen, Donny Y. and Chen, Feng and Zhuang, Bohan},
   journal      = {arXiv preprint arXiv:2609.01740},
-  year         = {2026},
-  url          = {https://arxiv.org/abs/2609.01740}
+  year         = {2026}
 }
 ```
 
