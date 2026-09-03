@@ -22,7 +22,7 @@
     <a href="https://bohanzhuang.github.io">Bohan Zhuang</a>
   </p>
   <h3 align="center">
-    <a >Paper</a>
+    <a href="https://arxiv.org/pdf/2609.01740">Paper</a>
     |
     <a href="https://forthloth.github.io/ziptok3d/">Project Page</a>
     |
@@ -237,3 +237,4 @@ This repository is intended for academic research and evaluation. The
 third-party components under `external/` retain their original licenses; see
 [`THIRD_PARTY.md`](THIRD_PARTY.md) and the corresponding `LICENSE` files.
 `pointops` is an external dependency and is not redistributed here.
+
