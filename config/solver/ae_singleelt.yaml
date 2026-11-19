@@ -1,0 +1,27 @@
+
+_target_: ziptok_retrain.solver.MultiBudgetSolver
+lr: 3.0e-5
+scale_lr_by_batch_size: false
+weight_decay: 0.01
+betas: [0.9, 0.999]
+use_cosine_annealing: true
+warmup_epochs: 10
+min_lr: 1.0e-6
+
+coeff_recon: 1.0
+coeff_init: 0.5
+coeff_uncertainty: 0.001
+coeff_intermediate: 0.5
+distill_schedule_steps: null
+distill_anchor_step: 0
+distill_anchor_alpha: 1.0
+logit_threshold: 0
+eval_chunk_size: 250000
+eval_num_latents: 128
+val_vis_interval: -1
+prefix_budget_weights: [0.22, 0.18, 0.15, 0.10, 0.09, 0.08, 0.08, 0.10]
+prefix_budget_weights_final: [1, 1, 1, 1, 1, 1, 1, 1]
+prefix_weight_anneal_epochs: [150, 250]
+val_budgets: [1, 2, 4, 128]
+score_budgets: [1, 2, 4]
+log_budget_losses: true
