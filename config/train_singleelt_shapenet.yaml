@@ -1,0 +1,37 @@
+_base_: _train_base
+seed: 20261117
+
+trainer:
+  max_epochs: 300
+  strategy: ddp
+  log_every_n_steps: 5
+  check_val_every_n_epoch: 1
+  precision: 16-mixed
+  gradient_clip_val: 0.5
+  accumulate_grad_batches: 7
+  num_sanity_val_steps: 0
+
+checkpoint:
+  save_top_k: 1
+  mode: max
+
+data:
+  _base_: data/shapenet
+  model_selection_split: val
+  batch_size: 20
+  eval_batch_size: 1
+  num_workers: 4
+  prefetch_factor: 2
+  num_query_points: 4096
+  pc_size: 2048
+  chunk_size: 5000
+  oversample_ratio: 3
+  use_queries: true
+  use_full_surface: false
+  repeat: 1
+
+model:
+  _base_: model/ae_singleelt
+
+solver:
+  _base_: solver/ae_singleelt
