@@ -1,4 +1,3 @@
-
 _target_: ziptok_retrain.solver.MultiBudgetSolver
 lr: 3.0e-5
 scale_lr_by_batch_size: false
