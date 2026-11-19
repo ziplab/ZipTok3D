@@ -1,0 +1,31 @@
+_target_: ziptok_retrain.model.WeightedPrefixAutoencoder
+
+output_dim: 1
+num_latents: 128
+embed_dim: 512
+query_dim: 32
+use_learnable_pos: true
+nested_dropout_strategy: exp
+
+encoder_params:
+  num_patches: 512
+  num_blocks: 4
+  num_layers_per_block: 3
+  num_heads: 8
+  mlp_ratio: 4.0
+  dropout: 0.1
+  causal_self_attention: false
+
+decoder_params:
+  output_resolution: 128
+  output_patch_size: 8
+  num_loops: 6
+  num_layers: 12
+  num_init_layers: 1
+  mlp_ratio: 2
+  keep_ratio: 0.25
+  num_merged_tokens: 128
+  use_conv_refine: false
+  num_heads: 8
+  dropout: 0.1
+  prune_dropout: 0.1
